@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>8-Team Sports Bracket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f2f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .bracket {
+	  display: flex;
+	  justify-content: space-around;
+	  align-items: stretch; /* Makes rounds take up equal vertical space */
+	  flex-wrap: nowrap;
+	  gap: 20px;
+    }
+    .round {
+      display: flex;
+      flex-direction: column;
+	  justify-content: center; /* Vertically centers the content */
+      gap: 30px;
+    }
+    .match {
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      min-width: 180px;
+      text-align: center;
+    }
+    .team {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .team:hover {
+      background: #e0e0e0;
+    }
+    .selected {
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>EHL 2025 Men's Bracket</h1>
+  <div class="bracket">
+    <!-- Round 1 -->
+    <div class="round" id="round1">
+	<h1> Quarter finals </h1>
+      <div class="match" data-match="1">
+        <div class="team" onclick="selectWinner(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/07/SV-Kampong.png" width="25" height="25" align="center"> SV Kampong</div>
+        <div class="team" onclick="selectWinner(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png" width="25" height="25" align="center"> Surbiton HC</div>
+      </div>
+      <div class="match" data-match="2">
+        <div class="team" onclick="selectWinner(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/03/HC-Bloemendaal.png" width="25" height="25" align="center"> HC Bloemendaal</div>
+        <div class="team" onclick="selectWinner(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png" width="25" height="25" align="center"> Club de Campo</div>
+      </div>
+      <div class="match" data-match="3">
+        <div class="team" onclick="selectWinner(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/old-georgians.jpeg" width="25" height="25" align="center"> Old Georgians HC</div>
+        <div class="team" onclick="selectWinner(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/12/HC-Rotterdam-NED-500x500-1.png" width="25" height="25" align="center"> HC Rotterdam</div>
+      </div>
+      <div class="match" data-match="4">
+        <div class="team" onclick="selectWinner(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsRoyal-Leopold.png" width="25" height="25" align="center"> Royal Léopold Club</div>
+        <div class="team" onclick="selectWinner(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" width="25" height="25" align="center"> Gantoise HC</div>
+      </div>
+    </div>
+
+    <!-- Semifinals -->
+    <div class="round" id="semifinals" align-items="center">
+	  <h1> Semi finals </h1>
+      <div class="match" data-match="5"></div>
+      <div class="match" data-match="6"></div>
+    </div>
+
+    <!-- Final -->
+    <div class="round" id="final">
+	  <h1> Finals </h1>
+      <div class="match" data-match="7"></div>
+	  <h1> 3rd Place </h1>
+	  <div class="match" data-match="8"></div>
+    </div>
+  </div>
+
+<script>
+	  const results = {};
+
+	function selectWinner(element, matchId) {
+	  const matchDiv = element.parentElement;
+	  const teams = matchDiv.querySelectorAll('.team');
+
+	  // Deselect all
+	  teams.forEach(team => team.classList.remove('selected'));
+
+	  // Select clicked team
+	  element.classList.add('selected');
+
+	  const img = element.querySelector('img');
+	  const imageUrl = img ? img.src : '';
+	  const teamName = element.textContent.trim();
+
+	  results[matchId] = teamName;
+
+	  // Determine winner's next match
+	  if (matchId <= 4) {
+		const nextMatchId = 4 + Math.ceil(matchId / 2);
+		const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
+		if (nextMatch) {
+		  const pos = matchId % 2 === 0 ? 1 : 0;
+		  insertTeam(nextMatch, imageUrl, teamName, pos, nextMatchId);
+		}
+	  } else if (matchId <= 6) {
+		const nextMatch = document.querySelector(`[data-match="7"]`);
+		const thirdPlaceMatch = document.querySelector(`[data-match="8"]`);
+
+		const pos = matchId % 2 === 0 ? 1 : 0;
+		insertTeam(nextMatch, imageUrl, teamName, pos, 7);
+
+		// Find losing team and place them in third place match
+		teams.forEach(team => {
+		  if (!team.classList.contains('selected')) {
+			const loserImg = team.querySelector('img');
+			const loserImageUrl = loserImg ? loserImg.src : '';
+			const loserName = team.textContent.trim();
+			const thirdPos = matchId % 2 === 0 ? 1 : 0;
+			insertTeam(thirdPlaceMatch, loserImageUrl, loserName, thirdPos, 8);
+		  }
+		});
+	  }
+	}
+
+
+  function insertTeam(matchDiv, imageUrl, teamName, position, matchId) {
+    let teams = matchDiv.querySelectorAll('.team');
+
+    // Create new team element
+    const newTeam = document.createElement('div');
+    newTeam.className = 'team';
+    newTeam.onclick = () => selectWinner(newTeam, matchId);
+
+    // Add image
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.className = 'team-img';
+    img.style.width = '25px';
+    img.style.height = '25px';
+    img.style.marginRight = '8px';
+    img.style.verticalAlign = 'middle';
+
+    // Add team name text
+    const span = document.createElement('span');
+    span.textContent = teamName;
+
+    // Combine them in one line
+    newTeam.appendChild(img);
+    newTeam.appendChild(span);
+
+    // Add or replace team in match
+    if (teams.length < 2) {
+      matchDiv.appendChild(newTeam);
+    } else {
+      matchDiv.replaceChild(newTeam, teams[position]);
+    }
+  }
+</script>
+</body>
+</html>
