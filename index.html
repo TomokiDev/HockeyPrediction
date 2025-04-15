@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>8-Team Sports Bracket</title>
+  <title>12-Team Sports Bracket</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,16 +13,16 @@
       text-align: center;
     }
     .bracket {
-	  display: flex;
-	  justify-content: space-around;
-	  align-items: stretch; /* Makes rounds take up equal vertical space */
-	  flex-wrap: nowrap;
-	  gap: 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      gap: 20px;
     }
     .round {
       display: flex;
       flex-direction: column;
-	  justify-content: center; /* Vertically centers the content */
+      justify-content: center;
       gap: 30px;
     }
     .match {
@@ -50,29 +50,34 @@
       color: white;
       font-weight: bold;
     }
+    .team-img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
-  <h1>EHL 2025 Men's Bracket</h1>
+
+<h1>EHL 2025 Men's Bracket</h1>
   <div class="bracket">
     <!-- Round 1 -->
     <div class="round" id="round1">
 	<h1> Quarter finals </h1>
       <div class="match" data-match="1">
-        <div class="team" onclick="selectWinner(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/07/SV-Kampong.png" width="25" height="25" align="center"> SV Kampong</div>
-        <div class="team" onclick="selectWinner(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png" width="25" height="25" align="center"> Surbiton HC</div>
+        <div class="team" onclick="selectWinnerMens(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/07/SV-Kampong.png" width="25" height="25" align="center"> SV Kampong</div>
+        <div class="team" onclick="selectWinnerMens(this, 1)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png" width="25" height="25" align="center"> Surbiton HC</div>
       </div>
       <div class="match" data-match="2">
-        <div class="team" onclick="selectWinner(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/03/HC-Bloemendaal.png" width="25" height="25" align="center"> HC Bloemendaal</div>
-        <div class="team" onclick="selectWinner(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png" width="25" height="25" align="center"> Club de Campo</div>
+        <div class="team" onclick="selectWinnerMens(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2023/03/HC-Bloemendaal.png" width="25" height="25" align="center"> HC Bloemendaal</div>
+        <div class="team" onclick="selectWinnerMens(this, 2)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png" width="25" height="25" align="center"> Club de Campo</div>
       </div>
       <div class="match" data-match="3">
-        <div class="team" onclick="selectWinner(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/old-georgians.jpeg" width="25" height="25" align="center"> Old Georgians HC</div>
-        <div class="team" onclick="selectWinner(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/12/HC-Rotterdam-NED-500x500-1.png" width="25" height="25" align="center"> HC Rotterdam</div>
+        <div class="team" onclick="selectWinnerMens(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/old-georgians.jpeg" width="25" height="25" align="center"> Old Georgians HC</div>
+        <div class="team" onclick="selectWinnerMens(this, 3)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/12/HC-Rotterdam-NED-500x500-1.png" width="25" height="25" align="center"> HC Rotterdam</div>
       </div>
       <div class="match" data-match="4">
-        <div class="team" onclick="selectWinner(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsRoyal-Leopold.png" width="25" height="25" align="center"> Royal Léopold Club</div>
-        <div class="team" onclick="selectWinner(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" width="25" height="25" align="center"> Gantoise HC</div>
+        <div class="team" onclick="selectWinnerMens(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsRoyal-Leopold.png" width="25" height="25" align="center"> Royal Léopold Club</div>
+        <div class="team" onclick="selectWinnerMens(this, 4)"><img class="team-img"	src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" width="25" height="25" align="center"> Gantoise HC</div>
       </div>
     </div>
 
@@ -93,62 +98,272 @@
   </div>
 
 <script>
-	  const results = {};
+	  const resultsMen = {};
+	  const forwardMap = {};
+	  const loserMapMen = {};
 
-	function selectWinner(element, matchId) {
+
+
+	function selectWinnerMens(element, matchId) {
 	  const matchDiv = element.parentElement;
 	  const teams = matchDiv.querySelectorAll('.team');
+	  if (element.classList.contains('selected')) return; // Prevent double processing
+		teams.forEach(team => team.classList.remove('selected'));
+		element.classList.add('selected');
 
-	  // Deselect all
-	  teams.forEach(team => team.classList.remove('selected'));
-
-	  // Select clicked team
-	  element.classList.add('selected');
 
 	  const img = element.querySelector('img');
 	  const imageUrl = img ? img.src : '';
 	  const teamName = element.textContent.trim();
 
-	  results[matchId] = teamName;
+	  resultsMen[matchId] = teamName;
 
-	  // Determine winner's next match
-	  if (matchId <= 4) {
-		const nextMatchId = 4 + Math.ceil(matchId / 2);
-		const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
-		if (nextMatch) {
-		  const pos = matchId % 2 === 0 ? 1 : 0;
-		  insertTeam(nextMatch, imageUrl, teamName, pos, nextMatchId);
+	  // Remove previous forwarded teams to the next round from this match
+	  const oldForward = forwardMap[matchId];
+	  if (oldForward) {
+		let nextMatchId = 0;
+		if (matchId <= 4) {
+		  nextMatchId = 4 + Math.ceil(matchId / 2);
+		} else if (matchId <= 6) {
+		  nextMatchId = 7;
 		}
-	  } else if (matchId <= 6) {
-		const nextMatch = document.querySelector(`[data-match="7"]`);
-		const thirdPlaceMatch = document.querySelector(`[data-match="8"]`);
+		const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
+		if (nextMatch) removeTeamFromMatchMens(nextMatch, oldForward);
+	  }
 
+	  forwardMap[matchId] = teamName;
+
+	  // Forward to semifinals
+	  if (matchId <= 4) {
+		const nextMatchId = 4 + Math.ceil(matchId / 2); // Match 5 or 6
+		const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
 		const pos = matchId % 2 === 0 ? 1 : 0;
-		insertTeam(nextMatch, imageUrl, teamName, pos, 7);
+		insertTeamMens(nextMatch, imageUrl, teamName, pos, nextMatchId);
+	  }
 
-		// Find losing team and place them in third place match
-		teams.forEach(team => {
-		  if (!team.classList.contains('selected')) {
-			const loserImg = team.querySelector('img');
-			const loserImageUrl = loserImg ? loserImg.src : '';
-			const loserName = team.textContent.trim();
-			const thirdPos = matchId % 2 === 0 ? 1 : 0;
-			insertTeam(thirdPlaceMatch, loserImageUrl, loserName, thirdPos, 8);
-		  }
-		});
+	else if (matchId <= 6) {
+	  const finalMatch = document.querySelector(`[data-match="7"]`);
+	  const thirdMatch = document.querySelector(`[data-match="8"]`);
+	  const pos = matchId % 2 === 0 ? 1 : 0;
+
+	  // Remove old winner from final
+	  const prevWinner = forwardMap[matchId];
+	  if (prevWinner) {
+		removeTeamFromMatchMens(finalMatch, prevWinner);
+	  }
+
+	  // Remove old loser from third place
+	  const prevLoser = loserMapMen[matchId];
+	  if (prevLoser) {
+		removeTeamFromMatchMens(thirdMatch, prevLoser);
+	  }
+
+	  // Insert new winner to finals
+	  insertTeamMens(finalMatch, imageUrl, teamName, pos, 7);
+	  forwardMap[matchId] = teamName;
+
+	  // Identify and insert loser to 3rd place
+	  const otherTeam = Array.from(teams).find(team => !team.classList.contains('selected'));
+	  if (otherTeam) {
+		const loserImg = otherTeam.querySelector('img');
+		const loserImageUrl = loserImg ? loserImg.src : '';
+		const loserName = otherTeam.textContent.trim();
+		const thirdPos = matchId % 2 === 0 ? 1 : 0;
+
+		insertTeamMens(thirdMatch, loserImageUrl, loserName, thirdPos, 8);
+		loserMapMen[matchId] = loserName;
 	  }
 	}
 
+	}
 
-  function insertTeam(matchDiv, imageUrl, teamName, position, matchId) {
+
+
+  function insertTeamMens(matchDiv, imageUrl, teamName, position, matchId) {
+	  let teams = matchDiv.querySelectorAll('.team');
+
+	  // Avoid duplicate entries
+	  for (let team of teams) {
+		if (team.textContent.trim() === teamName) return;
+	  }
+
+	  const newTeam = document.createElement('div');
+	  newTeam.className = 'team';
+	  newTeam.onclick = () => selectWinnerMens(newTeam, matchId);
+
+	  const img = document.createElement('img');
+	  img.src = imageUrl;
+	  img.className = 'team-img';
+	  img.style.width = '25px';
+	  img.style.height = '25px';
+	  img.style.marginRight = '8px';
+	  img.style.verticalAlign = 'middle';
+
+	  const span = document.createElement('span');
+	  span.textContent = teamName;
+
+	  newTeam.appendChild(img);
+	  newTeam.appendChild(span);
+
+	  if (teams.length < 2) {
+		matchDiv.appendChild(newTeam);
+	  } else {
+		matchDiv.replaceChild(newTeam, teams[position]);
+	  }
+	}
+	
+	function removeTeamFromMatchMens(matchDiv, teamName) {
+	  const teams = matchDiv.querySelectorAll('.team');
+	  teams.forEach(team => {
+		if (team.textContent.trim() === teamName) {
+		  matchDiv.removeChild(team);
+		}
+	  });
+	}
+
+</script>
+
+
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+
+  <h1>EHL 2025 Women's Bracket</h1>
+  <div class="bracket">
+    <!-- Play-in Round (First 4 matches = 8 teams) -->
+    <div class="round" id="round1">
+	<h1> Play-ins </h1>
+      <div class="match" data-match="9">
+	    <div class="team" onclick="selectWinnerWomen(this, 1)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/Railway-Union.png" width="25" height="25"> Railway Union HC</div>
+        <div class="team" onclick="selectWinnerWomen(this, 1)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/11/SCHC-NED-360x360-1.jpeg" width="25" height="25"> SCHC</div>
+      </div>
+      <div class="match" data-match="10">
+        <div class="team" onclick="selectWinnerWomen(this, 2)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Mannheimer.gif" width="25" height="25"> Manheimer HC</div>
+        <div class="team" onclick="selectWinnerWomen(this, 2)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/sumchanka.jpg" width="25" height="25"> MSC Sumchanka</div>
+      </div>
+      <div class="match" data-match="11">
+	    <div class="team" onclick="selectWinnerWomen(this, 3)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png" width="25" height="25"> Club de Campo</div>
+        <div class="team" onclick="selectWinnerWomen(this, 3)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/Braxgata.jpeg" width="25" height="25"> Braxgata HC</div>
+      </div>
+      <div class="match" data-match="12">
+        <div class="team" onclick="selectWinnerWomen(this, 4)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/SK-Slavia-Prague-CZE-449x500-1.jpeg" width="25" height="25"> SK Slavia Prague</div>
+        <div class="team" onclick="selectWinnerWomen(this, 4)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png" width="25" height="25"> Surbiton HC</div>
+      </div>
+    </div>
+
+    <!-- Quarterfinals: 4 seeded teams + 4 winners from round 1 -->
+    <div class="round" id="quarterfinals">
+		<h1> Quarter finals </h1>
+      <div class="match" data-match="13">
+        <div class="team" onclick="selectWinnerWomen(this, 5)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2019/10/Den-Bosch.png" width="25" height="25"> HC 's-Hertogenbosch</div>
+        <!-- Winner of Match 1 inserted here -->
+      </div>
+      <div class="match" data-match="14">
+        <div class="team" onclick="selectWinnerWomen(this, 6)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" width="25" height="25"> Gantoise</div>
+        <!-- Winner of Match 2 -->
+      </div>
+      <div class="match" data-match="15">
+        <div class="team" onclick="selectWinnerWomen(this, 7)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/03/Real-Club-de-Polo.png" width="25" height="25"> Real Club de Polo</div>
+        <!-- Winner of Match 3 -->
+      </div>
+      <div class="match" data-match="16">
+        <div class="team" onclick="selectWinnerWomen(this, 8)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/12/dusseldorf.png" width="25" height="25"> Düsseldorfer HC</div>
+        <!-- Winner of Match 4 -->
+      </div>
+    </div>
+
+    <!-- Semifinals -->
+    <div class="round" id="semifinals">
+		<h1> Semi finals </h1>
+      <div class="match" data-match="17"></div>
+      <div class="match" data-match="18"></div>
+    </div>
+
+    <!-- Final + Third Place -->
+    <div class="round" id="final">
+		<h1> Finals </h1>
+      <div class="match" data-match="19"></div> <!-- Final -->
+	  	  <h1> 3rd Place </h1>
+      <div class="match" data-match="20"></div> <!-- Third Place -->
+    </div>
+  </div>
+
+  <script>
+  const resultsWomen = {};
+  const forwardMapWomen = {};
+  const loserMapWomen = {};
+
+  function selectWinnerWomen(element, matchId) {
+    const matchDiv = element.parentElement;
+    const teams = matchDiv.querySelectorAll('.team');
+    if (element.classList.contains('selected')) return;
+    teams.forEach(team => team.classList.remove('selected'));
+    element.classList.add('selected');
+
+    const img = element.querySelector('img');
+    const imageUrl = img ? img.src : '';
+    const teamName = element.textContent.trim();
+    resultsWomen[matchId] = teamName;
+
+    const oldForward = forwardMapWomen[matchId];
+    if (oldForward) {
+      let nextMatchId = 0;
+      if (matchId <= 4) nextMatchId = 12 + matchId;
+      else if (matchId <= 8) nextMatchId = 16 + Math.ceil((matchId - 4) / 2);
+      else if (matchId <= 10) nextMatchId = 19;
+      const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
+      if (nextMatch) removeTeamFromMatchMens(nextMatch, oldForward);
+    }
+
+    forwardMapWomen[matchId] = teamName;
+
+    if (matchId >= 1 && matchId <= 4) {
+      const nextMatchId = 12 + matchId;
+      const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
+      insertTeamWomen(nextMatch, imageUrl, teamName, 1, nextMatchId - 8);
+    } else if (matchId >= 5 && matchId <= 8) {
+      const nextMatchId = 16 + Math.ceil((matchId - 4) / 2);
+      const nextMatch = document.querySelector(`[data-match="${nextMatchId}"]`);
+      const pos = matchId % 2 === 0 ? 1 : 0;
+      insertTeamWomen(nextMatch, imageUrl, teamName, pos, nextMatchId - 8);
+    } else if (matchId >= 9 && matchId <= 10) {
+      const finalMatch = document.querySelector(`[data-match="19"]`);
+      const thirdMatch = document.querySelector(`[data-match="20"]`);
+      const pos = matchId % 2 === 0 ? 1 : 0;
+
+      const prevWinner = forwardMapWomen[matchId];
+      if (prevWinner) removeTeamFromMatchMens(finalMatch, prevWinner);
+
+      const prevLoser = loserMapWomen[matchId];
+      if (prevLoser) removeTeamFromMatchMens(thirdMatch, prevLoser);
+
+      insertTeamWomen(finalMatch, imageUrl, teamName, pos, 11);
+      forwardMapWomen[matchId] = teamName;
+
+      const otherTeam = Array.from(teams).find(team => !team.classList.contains('selected'));
+      if (otherTeam) {
+        const loserImg = otherTeam.querySelector('img');
+        const loserImageUrl = loserImg ? loserImg.src : '';
+        const loserName = otherTeam.textContent.trim();
+        const thirdPos = matchId % 2 === 0 ? 1 : 0;
+
+        insertTeamWomen(thirdMatch, loserImageUrl, loserName, thirdPos, 12);
+        loserMapWomen[matchId] = loserName;
+      }
+    }
+  }
+
+  function insertTeamWomen(matchDiv, imageUrl, teamName, position, matchId) {
     let teams = matchDiv.querySelectorAll('.team');
+    for (let team of teams) {
+      if (team.textContent.trim() === teamName) return;
+    }
 
-    // Create new team element
     const newTeam = document.createElement('div');
     newTeam.className = 'team';
-    newTeam.onclick = () => selectWinner(newTeam, matchId);
+    newTeam.onclick = () => selectWinnerWomen(newTeam, matchId);
 
-    // Add image
     const img = document.createElement('img');
     img.src = imageUrl;
     img.className = 'team-img';
@@ -157,21 +372,18 @@
     img.style.marginRight = '8px';
     img.style.verticalAlign = 'middle';
 
-    // Add team name text
     const span = document.createElement('span');
     span.textContent = teamName;
 
-    // Combine them in one line
     newTeam.appendChild(img);
     newTeam.appendChild(span);
 
-    // Add or replace team in match
     if (teams.length < 2) {
       matchDiv.appendChild(newTeam);
     } else {
       matchDiv.replaceChild(newTeam, teams[position]);
     }
   }
-</script>
+  </script>
 </body>
 </html>
