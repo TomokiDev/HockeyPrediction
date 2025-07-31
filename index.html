@@ -50,6 +50,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.2s ease-in-out;
+            touch-action: none;
         }
 
         .team.dragging {
@@ -64,13 +65,9 @@
         .rank {
             width: 20px;
             display: inline-block;
+            font-weight: bold;
+            margin-right: 8px;
             text-align: right;
-        }
-
-        .divider-top2 {
-            border-top: 1px solid #999;
-            margin-top: 8px;
-            padding-top: 10px;
         }
 
         .divider {
@@ -81,13 +78,12 @@
         }
 
         .top-team {
-            background-color: #e6f9e6; /* light green */
+            background-color: #e6f9e6;
         }
 
         .bottom-team {
-            background-color: #fbeaea; /* light red */
+            background-color: #fbeaea;
         }
-
     </style>
 </head>
 <body>
@@ -99,20 +95,20 @@
     <div class="pool">
         <h2>Pool A</h2>
         <ul class="team-list" data-pool="A">
-            <li class="team" draggable="true"><span class="rank">4</span><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria</li>
-            <li class="team" draggable="true"><span class="rank">2</span><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium</li>
-            <li class="team" draggable="true"><span class="rank">1</span><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands</li>
-            <li class="team" draggable="true"><span class="rank">3</span><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria</li>
         </ul>
     </div>
 
     <div class="pool">
         <h2>Pool B</h2>
         <ul class="team-list" data-pool="B">
-            <li class="team" draggable="true"><span class="rank">2</span><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England</li>
-            <li class="team" draggable="true"><span class="rank">3</span><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France</li>
-            <li class="team" draggable="true"><span class="rank">1</span><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany</li>
-            <li class="team" draggable="true"><span class="rank">4</span><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland</li>
         </ul>
     </div>
 </div>
@@ -120,9 +116,10 @@
 <script>
     const teamLists = document.querySelectorAll('.team-list');
     let dragSourcePool = null;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     teamLists.forEach(list => {
-        updateRankings(list); // Initial ranking
+        updateRankings(list); // Initial rank display
 
         list.addEventListener('dragstart', e => {
             if (e.target.classList.contains('team')) {
@@ -134,7 +131,7 @@
         list.addEventListener('dragend', e => {
             e.target.classList.remove('dragging');
             dragSourcePool = null;
-            updateRankings(list); // Update after drop
+            updateRankings(list);
         });
 
         list.addEventListener('dragover', e => {
@@ -154,8 +151,59 @@
 
         list.addEventListener('drop', e => {
             e.preventDefault();
-            updateRankings(list); // Ensure rankings are correct
+            updateRankings(list);
         });
+
+        // TOUCH SUPPORT for mobile
+        if (isTouchDevice) {
+            let draggedItem = null;
+            let touchStartY = 0;
+
+            list.addEventListener('touchstart', e => {
+                const touchTarget = e.target.closest('.team');
+                if (!touchTarget) return;
+
+                draggedItem = touchTarget;
+                draggedItem.classList.add('dragging');
+                touchStartY = e.touches[0].clientY;
+            });
+
+            list.addEventListener('touchmove', e => {
+                if (!draggedItem) return;
+
+                const touchY = e.touches[0].clientY;
+                const direction = touchY > touchStartY ? 'down' : 'up';
+                touchStartY = touchY;
+
+                const items = [...list.querySelectorAll('.team:not(.dragging)')];
+                let swapWith = null;
+
+                for (const item of items) {
+                    const box = item.getBoundingClientRect();
+                    const middleY = box.top + box.height / 2;
+                    if ((direction === 'down' && touchY > middleY) ||
+                        (direction === 'up' && touchY < middleY)) {
+                        swapWith = item;
+                    }
+                }
+
+                if (swapWith) {
+                    if (direction === 'down') {
+                        swapWith.after(draggedItem);
+                    } else {
+                        swapWith.before(draggedItem);
+                    }
+                }
+            });
+
+            list.addEventListener('touchend', () => {
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                    draggedItem = null;
+                    updateRankings(list);
+                }
+            });
+        }
     });
 
     function getDragAfterElement(container, y) {
@@ -173,42 +221,38 @@
     }
 
     function updateRankings(list) {
-        // Remove any existing dividers
-        list.querySelectorAll('.divider').forEach(divider => divider.remove());
+        // Remove existing divider
+        list.querySelectorAll('.divider').forEach(div => div.remove());
 
         const teams = Array.from(list.querySelectorAll('.team'));
         teams.forEach((team, index) => {
-            // Handle rank number
+            // Add rank number
             let rankSpan = team.querySelector('.rank');
             if (!rankSpan) {
                 rankSpan = document.createElement('span');
                 rankSpan.className = 'rank';
-                rankSpan.style.fontWeight = 'bold';
-                rankSpan.style.marginRight = '8px';
                 team.insertBefore(rankSpan, team.firstChild);
             }
-            rankSpan.textContent = `${index + 1}`;
+            rankSpan.textContent = `${index + 1}.`;
 
-            // Clear previous classes
+            // Reset background classes
             team.classList.remove('top-team', 'bottom-team');
 
-            // Add new style classes
+            // Apply styles
             if (index <= 1) {
-                team.classList.add('top-team'); // Ranks 1 and 2
+                team.classList.add('top-team');
             } else {
-                team.classList.add('bottom-team'); // Ranks 3 and 4
+                team.classList.add('bottom-team');
             }
         });
 
-        // Insert divider between 2nd and 3rd
+        // Insert divider after 2nd place
         if (teams.length >= 3) {
             const divider = document.createElement('li');
             divider.className = 'divider';
             list.insertBefore(divider, teams[2]);
         }
     }
-
 </script>
-
 </body>
 </html>
