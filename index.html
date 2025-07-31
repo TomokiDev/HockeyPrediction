@@ -264,7 +264,7 @@
             if (button.classList.contains('down')) {
                 const next = team.nextElementSibling;
                 if (next && next.classList.contains('team')) {
-                    list.insertBefore(next, team);
+                    list.insertBefore(team, next.nextSibling);
                 }
             }
 
