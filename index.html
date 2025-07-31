@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Team Pool Prediction</title>
     <style>
         body {
@@ -60,11 +60,13 @@
             justify-content: space-between;
             gap: 10px;
             transition: background 0.2s ease-in-out;
+            cursor: grab;
         }
 
         .team img {
             width: 25px;
             height: 25px;
+            pointer-events: none;
         }
 
         .rank {
@@ -78,7 +80,7 @@
         .divider {
             height: 1px;
             background: #999;
-            margin: 10px 0;
+            margin: 5px 0;
             list-style: none;
         }
 
@@ -106,6 +108,7 @@
         .team-buttons button {
             font-size: 10px;
             padding: 3px 5px;
+            cursor: pointer;
         }
 
         @media (max-width: 600px) {
@@ -114,11 +117,7 @@
             }
 
             .team {
-                cursor: default !important;
-            }
-
-            .team[draggable="true"] {
-                pointer-events: none;
+                cursor: default;
             }
         }
     </style>
@@ -126,7 +125,7 @@
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center;">Reorder teams within their pool.</p>
+<p style="text-align:center;">Rank the teams within their pool.</p>
 
 <div class="pools">
     <div class="pool">
@@ -223,7 +222,14 @@
 </div>
 
 <script>
+    const isMobile = window.innerWidth <= 600;
     const teamLists = document.querySelectorAll('.team-list');
+
+    if (isMobile) {
+        document.querySelectorAll('.team').forEach(team => {
+            team.removeAttribute('draggable');
+        });
+    }
 
     teamLists.forEach(list => {
         updateRankings(list);
@@ -252,6 +258,43 @@
                 }
             });
         });
+
+        if (!isMobile) {
+            let dragSourcePool = null;
+
+            list.addEventListener('dragstart', e => {
+                if (e.target.classList.contains('team')) {
+                    dragSourcePool = list.dataset.pool;
+                    e.target.classList.add('dragging');
+                }
+            });
+
+            list.addEventListener('dragend', e => {
+                e.target.classList.remove('dragging');
+                dragSourcePool = null;
+            });
+
+            list.addEventListener('dragover', e => {
+                e.preventDefault();
+                const dragging = document.querySelector('.dragging');
+                const currentPool = list.dataset.pool;
+
+                if (!dragging || dragSourcePool !== currentPool) return;
+
+                const afterElement = getDragAfterElement(list, e.clientY);
+                if (afterElement == null) {
+                    list.appendChild(dragging);
+                } else {
+                    list.insertBefore(dragging, afterElement);
+                }
+
+                updateRankings(list);
+            });
+
+            list.addEventListener('drop', e => {
+                e.preventDefault();
+            });
+        }
     });
 
     function updateRankings(list) {
@@ -273,6 +316,20 @@
             divider.className = 'divider';
             list.insertBefore(divider, teams[2]);
         }
+    }
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.team:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 </script>
 </body>
