@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Team Pool Prediction</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f2;
             padding: 20px;
-            user-select: none;
+            user-select: none; /* disable text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         h1 {
@@ -22,12 +25,6 @@
             gap: 30px;
             max-width: 800px;
             margin: auto;
-        }
-
-        @media (max-width: 600px) {
-            .pools {
-                grid-template-columns: 1fr;
-            }
         }
 
         .pool {
@@ -46,6 +43,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            position: relative;
         }
 
         .team {
@@ -55,111 +53,118 @@
             border-radius: 5px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 10px;
             transition: background 0.2s ease-in-out;
+            user-select: none;
         }
 
         .team img {
             width: 25px;
             height: 25px;
+            user-select: none;
             pointer-events: none;
         }
 
-        .rank {
-            width: 20px;
-            display: inline-block;
-            font-weight: bold;
-            margin-right: 8px;
-            text-align: right;
+        /* Green tint top 2 */
+        .team:nth-child(1),
+        .team:nth-child(2) {
+            background-color: #d0f0d0; /* subtle green */
         }
 
-        .divider {
-            height: 1px;
-            background: #999;
-            margin: 5px 0;
-            list-style: none;
+        /* Red tint bottom 2 */
+        .team:nth-child(3),
+        .team:nth-child(4) {
+            background-color: #f8d0d0; /* subtle red */
         }
 
-        .top-team {
-            background-color: #e6f9e6;
-        }
-
-        .bottom-team {
-            background-color: #fbeaea;
-        }
-
-        .team-content {
+        /* Buttons container inline */
+        .btn-container {
+            margin-left: auto;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-grow: 1;
+            gap: 5px;
         }
 
-        .team-buttons {
-            display: flex;
-            flex-direction: row;
-            gap: 4px;
-        }
-
-        .team-buttons button {
-            font-size: 12px;
-            padding: 3px 6px;
+        button {
+            padding: 4px 8px;
+            font-size: 14px;
             cursor: pointer;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            background: #fff;
+            transition: background 0.2s ease-in-out;
+            user-select: none;
         }
 
-        .hidden {
-            visibility: hidden;
+        button:hover:not(:disabled) {
+            background: #eee;
+        }
+
+        button:disabled {
+            cursor: default;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Dividing line between 2nd and 3rd team */
+        .team-list::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: #888;
+            top: calc((100% / 4) * 2 - 1px); /* between 2nd and 3rd */
+            pointer-events: none;
+            border-radius: 1px;
+        }
+
+        /* Mobile styles: pools stacked vertically */
+        @media (max-width: 600px) {
+            .pools {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center;">Use the arrows to rank teams within each pool.</p>
+<p style="text-align:center;">Use the up/down buttons to rank teams within their pool.</p>
 
 <div class="pools">
     <div class="pool">
         <h2>Pool A</h2>
         <ul class="team-list" data-pool="A">
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png" alt="Netherlands">
+                Netherlands
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg" alt="Belgium">
+                Belgium
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png" alt="Spain">
+                Spain
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg" alt="Austria">
+                Austria
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
         </ul>
@@ -169,43 +174,35 @@
         <h2>Pool B</h2>
         <ul class="team-list" data-pool="B">
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png" alt="Germany">
+                Germany
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg" alt="England">
+                England
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png" alt="France">
+                France
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
             <li class="team">
-                <div class="team-content">
-                    <span class="rank"></span>
-                    <img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland
-                </div>
-                <div class="team-buttons">
-                    <button class="up">▲</button>
-                    <button class="down">▼</button>
+                <img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png" alt="Poland">
+                Poland
+                <div class="btn-container">
+                    <button class="up-btn" aria-label="Move up">▲</button>
+                    <button class="down-btn" aria-label="Move down">▼</button>
                 </div>
             </li>
         </ul>
@@ -213,64 +210,62 @@
 </div>
 
 <script>
-    function updateTeams(list) {
-        const teams = [...list.querySelectorAll('.team')];
-        list.querySelectorAll('.divider').forEach(d => d.remove());
-
-        teams.forEach((team, index) => {
-            team.classList.remove('top-team', 'bottom-team');
-
-            const rankEl = team.querySelector('.rank');
-            rankEl.textContent = `${index + 1}.`;
-
-            if (index <= 1) {
-                team.classList.add('top-team');
-            } else {
-                team.classList.add('bottom-team');
-            }
-
-            // Hide up on first, down on last
-            const upBtn = team.querySelector('.up');
-            const downBtn = team.querySelector('.down');
-            upBtn.classList.toggle('hidden', index === 0);
-            downBtn.classList.toggle('hidden', index === teams.length - 1);
-        });
-
-        // Insert divider between 2nd and 3rd
-        if (teams.length >= 3) {
-            const divider = document.createElement('li');
-            divider.classList.add('divider');
-            list.insertBefore(divider, teams[2]);
-        }
+    // Move team up by inserting before previous sibling
+    function moveUp(button) {
+        const team = button.closest('.team');
+        const list = team.parentElement;
+        const prev = team.previousElementSibling;
+        if (!prev) return; // already at top
+        list.insertBefore(team, prev);
+        updateTeams(list);
     }
 
-    document.querySelectorAll('.team-list').forEach(list => {
+    // Move team down by inserting next sibling before current (swap)
+    function moveDown(button) {
+        const team = button.closest('.team');
+        const list = team.parentElement;
+        const next = team.nextElementSibling;
+        if (!next) return; // already at bottom
+        list.insertBefore(next, team);
         updateTeams(list);
+    }
 
-        list.addEventListener('click', e => {
-            const button = e.target.closest('button');
-            if (!button) return;
+    // Update buttons visibility and coloring for a list
+    function updateTeams(list) {
+        const teams = Array.from(list.children);
 
-            const team = button.closest('.team');
-            if (!team) return;
+        teams.forEach((team, index) => {
+            const upBtn = team.querySelector('.up-btn');
+            const downBtn = team.querySelector('.down-btn');
 
-            if (button.classList.contains('up')) {
-                const prev = team.previousElementSibling;
-                if (prev && prev.classList.contains('team')) {
-                    list.insertBefore(team, prev);
-                }
-            }
+            // Show/hide up/down buttons appropriately
+            upBtn.disabled = index === 0;
+            downBtn.disabled = index === teams.length - 1;
 
-            if (button.classList.contains('down')) {
-                const next = team.nextElementSibling;
-                if (next && next.classList.contains('team')) {
-                    list.insertBefore(team, next.nextSibling);
-                }
-            }
+            // Clear tint classes to reset (if using classes)
+            // We are using nth-child in CSS so this is optional
 
-            updateTeams(list);
+            // (If needed, you could add classes here instead of CSS nth-child)
         });
-    });
+    }
+
+    // Attach click listeners to all buttons
+    function init() {
+        document.querySelectorAll('.up-btn').forEach(btn => {
+            btn.addEventListener('click', () => moveUp(btn));
+        });
+
+        document.querySelectorAll('.down-btn').forEach(btn => {
+            btn.addEventListener('click', () => moveDown(btn));
+        });
+
+        // Initialize buttons state on page load
+        document.querySelectorAll('.team-list').forEach(updateTeams);
+    }
+
+    // Run on page load
+    window.addEventListener('DOMContentLoaded', init);
 </script>
+
 </body>
 </html>
