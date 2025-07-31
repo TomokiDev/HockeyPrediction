@@ -2,17 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Team Pool Prediction</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f2;
             padding: 20px;
-            user-select: none; /* no text selection */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+            user-select: none;
         }
 
         h1 {
@@ -27,13 +24,11 @@
             margin: auto;
         }
 
-        /* Mobile: stack pools vertically */
         @media (max-width: 600px) {
             .pools {
                 grid-template-columns: 1fr;
             }
         }
-
 
         .pool {
             background: #ffffff;
@@ -45,17 +40,14 @@
         .pool h2 {
             margin-top: 0;
             text-align: center;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .team-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            touch-action: pan-y;
-            overscroll-behavior-x: none;
             overflow-x: hidden;
+            touch-action: pan-y;
         }
 
         .team {
@@ -63,29 +55,16 @@
             margin-bottom: 10px;
             background: #e8e8e8;
             border-radius: 5px;
-            cursor: grab;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             transition: background 0.2s ease-in-out;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .team.dragging {
-            opacity: 0.5;
         }
 
         .team img {
             width: 25px;
             height: 25px;
-            user-select: none;
-            -webkit-user-drag: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            -webkit-user-select: none;
-            pointer-events: none; /* prevent drag ghost on mobile */
         }
 
         .rank {
@@ -94,8 +73,6 @@
             font-weight: bold;
             margin-right: 8px;
             text-align: right;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .divider {
@@ -112,169 +89,185 @@
         .bottom-team {
             background-color: #fbeaea;
         }
+
+        .team-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .team-buttons {
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .team-buttons button {
+            font-size: 10px;
+            padding: 3px 5px;
+        }
+
+        @media (max-width: 600px) {
+            .team-buttons {
+                display: flex;
+            }
+
+            .team {
+                cursor: default !important;
+            }
+
+            .team[draggable="true"] {
+                pointer-events: none;
+            }
+        }
     </style>
 </head>
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center; user-select:none; -webkit-user-select:none;">Drag and drop the teams to rank them within their pool.</p>
+<p style="text-align:center;">Reorder teams within their pool.</p>
 
 <div class="pools">
     <div class="pool">
         <h2>Pool A</h2>
         <ul class="team-list" data-pool="A">
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png" alt="Netherlands Flag"> Netherlands</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg" alt="Belgium Flag"> Belgium</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png" alt="Spain Flag"> Spain</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg" alt="Austria Flag"> Austria</li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
         </ul>
     </div>
 
     <div class="pool">
         <h2>Pool B</h2>
         <ul class="team-list" data-pool="B">
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png" alt="Germany Flag"> Germany</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg" alt="England Flag"> England</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png" alt="France Flag"> France</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png" alt="Poland Flag"> Poland</li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
+            <li class="team" draggable="true">
+                <div class="team-content">
+                    <span class="rank"></span>
+                    <img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland
+                </div>
+                <div class="team-buttons">
+                    <button class="up">▲</button>
+                    <button class="down">▼</button>
+                </div>
+            </li>
         </ul>
     </div>
 </div>
 
 <script>
     const teamLists = document.querySelectorAll('.team-list');
-    let dragSourcePool = null;
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     teamLists.forEach(list => {
-        updateRankings(list); // Initial rank display
+        updateRankings(list);
 
-        list.addEventListener('dragstart', e => {
-            if (e.target.classList.contains('team')) {
-                dragSourcePool = list.dataset.pool;
-                e.target.classList.add('dragging');
-            }
-        });
+        const upButtons = list.querySelectorAll('.up');
+        const downButtons = list.querySelectorAll('.down');
 
-        list.addEventListener('dragend', e => {
-            e.target.classList.remove('dragging');
-            dragSourcePool = null;
-            updateRankings(list);
-        });
-
-        list.addEventListener('dragover', e => {
-            e.preventDefault();
-            const dragging = document.querySelector('.dragging');
-            const currentPool = list.dataset.pool;
-
-            if (!dragging || dragSourcePool !== currentPool) return;
-
-            const afterElement = getDragAfterElement(list, e.clientY);
-            if (afterElement == null) {
-                list.appendChild(dragging);
-            } else {
-                list.insertBefore(dragging, afterElement);
-            }
-        });
-
-        list.addEventListener('drop', e => {
-            e.preventDefault();
-            updateRankings(list);
-        });
-
-        // TOUCH SUPPORT for mobile
-        if (isTouchDevice) {
-            let draggedItem = null;
-            let touchStartY = 0;
-
-            list.addEventListener('touchstart', e => {
-                const touchTarget = e.target.closest('.team');
-                if (!touchTarget) return;
-
-                draggedItem = touchTarget;
-                draggedItem.classList.add('dragging');
-                touchStartY = e.touches[0].clientY;
-            });
-
-            list.addEventListener('touchmove', e => {
-                if (!draggedItem) return;
-
-                const touchY = e.touches[0].clientY;
-                const direction = touchY > touchStartY ? 'down' : 'up';
-                touchStartY = touchY;
-
-                const items = [...list.querySelectorAll('.team:not(.dragging)')];
-                let swapWith = null;
-
-                for (const item of items) {
-                    const box = item.getBoundingClientRect();
-                    const middleY = box.top + box.height / 2;
-                    if ((direction === 'down' && touchY > middleY) ||
-                        (direction === 'up' && touchY < middleY)) {
-                        swapWith = item;
-                    }
-                }
-
-                if (swapWith) {
-                    if (direction === 'down') {
-                        swapWith.after(draggedItem);
-                    } else {
-                        swapWith.before(draggedItem);
-                    }
-                }
-            });
-
-            list.addEventListener('touchend', () => {
-                if (draggedItem) {
-                    draggedItem.classList.remove('dragging');
-                    draggedItem = null;
+        upButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const team = button.closest('.team');
+                const prev = team.previousElementSibling;
+                if (prev && prev.classList.contains('team')) {
+                    list.insertBefore(team, prev);
                     updateRankings(list);
                 }
             });
-        }
+        });
+
+        downButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const team = button.closest('.team');
+                const next = team.nextElementSibling;
+                if (next && next.classList.contains('team')) {
+                    list.insertBefore(next, team);
+                    updateRankings(list);
+                }
+            });
+        });
     });
 
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.team:not(.dragging)')];
-
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
     function updateRankings(list) {
-        // Remove existing divider
         list.querySelectorAll('.divider').forEach(div => div.remove());
 
         const teams = Array.from(list.querySelectorAll('.team'));
         teams.forEach((team, index) => {
-            // Add rank number
-            let rankSpan = team.querySelector('.rank');
-            if (!rankSpan) {
-                rankSpan = document.createElement('span');
-                rankSpan.className = 'rank';
-                team.insertBefore(rankSpan, team.firstChild);
-            }
-            rankSpan.textContent = `${index + 1}.`;
-
-            // Reset background classes
             team.classList.remove('top-team', 'bottom-team');
 
-            // Apply styles
-            if (index <= 1) {
-                team.classList.add('top-team');
-            } else {
-                team.classList.add('bottom-team');
-            }
+            const rankSpan = team.querySelector('.rank');
+            if (rankSpan) rankSpan.textContent = `${index + 1}.`;
+
+            if (index <= 1) team.classList.add('top-team');
+            else team.classList.add('bottom-team');
         });
 
-        // Insert divider after 2nd place
         if (teams.length >= 3) {
             const divider = document.createElement('li');
             divider.className = 'divider';
