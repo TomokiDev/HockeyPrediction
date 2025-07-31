@@ -46,8 +46,6 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            overflow-x: hidden;
-            touch-action: pan-y;
         }
 
         .team {
@@ -60,7 +58,6 @@
             justify-content: space-between;
             gap: 10px;
             transition: background 0.2s ease-in-out;
-            cursor: grab;
         }
 
         .team img {
@@ -100,25 +97,19 @@
         }
 
         .team-buttons {
-            display: none;
-            flex-direction: column;
-            gap: 2px;
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
         }
 
         .team-buttons button {
-            font-size: 10px;
-            padding: 3px 5px;
+            font-size: 12px;
+            padding: 3px 6px;
             cursor: pointer;
         }
 
-        @media (max-width: 600px) {
-            .team-buttons {
-                display: flex;
-            }
-
-            .team {
-                cursor: default;
-            }
+        .hidden {
+            visibility: hidden;
         }
     </style>
 </head>
@@ -131,7 +122,7 @@
     <div class="pool">
         <h2>Pool A</h2>
         <ul class="team-list" data-pool="A">
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands
@@ -141,7 +132,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium
@@ -151,7 +142,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain
@@ -161,7 +152,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria
@@ -177,7 +168,7 @@
     <div class="pool">
         <h2>Pool B</h2>
         <ul class="team-list" data-pool="B">
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany
@@ -187,7 +178,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England
@@ -197,7 +188,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France
@@ -207,7 +198,7 @@
                     <button class="down">▼</button>
                 </div>
             </li>
-            <li class="team" draggable="true">
+            <li class="team">
                 <div class="team-content">
                     <span class="rank"></span>
                     <img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland
@@ -222,14 +213,7 @@
 </div>
 
 <script>
-    const isMobile = window.innerWidth <= 600;
     const teamLists = document.querySelectorAll('.team-list');
-
-    if (isMobile) {
-        document.querySelectorAll('.team').forEach(team => {
-            team.removeAttribute('draggable');
-        });
-    }
 
     teamLists.forEach(list => {
         updateRankings(list);
@@ -258,43 +242,6 @@
                 }
             });
         });
-
-        if (!isMobile) {
-            let dragSourcePool = null;
-
-            list.addEventListener('dragstart', e => {
-                if (e.target.classList.contains('team')) {
-                    dragSourcePool = list.dataset.pool;
-                    e.target.classList.add('dragging');
-                }
-            });
-
-            list.addEventListener('dragend', e => {
-                e.target.classList.remove('dragging');
-                dragSourcePool = null;
-            });
-
-            list.addEventListener('dragover', e => {
-                e.preventDefault();
-                const dragging = document.querySelector('.dragging');
-                const currentPool = list.dataset.pool;
-
-                if (!dragging || dragSourcePool !== currentPool) return;
-
-                const afterElement = getDragAfterElement(list, e.clientY);
-                if (afterElement == null) {
-                    list.appendChild(dragging);
-                } else {
-                    list.insertBefore(dragging, afterElement);
-                }
-
-                updateRankings(list);
-            });
-
-            list.addEventListener('drop', e => {
-                e.preventDefault();
-            });
-        }
     });
 
     function updateRankings(list) {
@@ -309,6 +256,12 @@
 
             if (index <= 1) team.classList.add('top-team');
             else team.classList.add('bottom-team');
+
+            // Show/hide buttons as appropriate
+            const upBtn = team.querySelector('.up');
+            const downBtn = team.querySelector('.down');
+            upBtn.classList.toggle('hidden', index === 0);
+            downBtn.classList.toggle('hidden', index === teams.length - 1);
         });
 
         if (teams.length >= 3) {
@@ -316,20 +269,6 @@
             divider.className = 'divider';
             list.insertBefore(divider, teams[2]);
         }
-    }
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.team:not(.dragging)')];
-
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 </script>
 </body>
