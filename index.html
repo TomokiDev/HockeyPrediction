@@ -237,12 +237,11 @@
                 const team = button.closest('.team');
                 const next = team.nextElementSibling;
                 if (next && next.classList.contains('team')) {
-                    list.insertBefore(next, team);
+                    list.insertBefore(team, next.nextElementSibling);
                     updateRankings(list);
                 }
             });
         });
-    });
 
     function updateRankings(list) {
         list.querySelectorAll('.divider').forEach(div => div.remove());
