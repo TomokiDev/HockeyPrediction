@@ -116,7 +116,7 @@
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center;">Rank the teams within their pool.</p>
+<p style="text-align:center;">Use the arrows to rank teams within each pool.</p>
 
 <div class="pools">
     <div class="pool">
@@ -213,62 +213,64 @@
 </div>
 
 <script>
-    const teamLists = document.querySelectorAll('.team-list');
+    function updateTeams(list) {
+        const teams = [...list.querySelectorAll('.team')];
+        list.querySelectorAll('.divider').forEach(d => d.remove());
 
-    teamLists.forEach(list => {
-        updateRankings(list);
-
-        const upButtons = list.querySelectorAll('.up');
-        const downButtons = list.querySelectorAll('.down');
-
-        upButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const team = button.closest('.team');
-                const prev = team.previousElementSibling;
-                if (prev && prev.classList.contains('team')) {
-                    list.insertBefore(team, prev);
-                    updateRankings(list);
-                }
-            });
-        });
-
-        downButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const team = button.closest('.team');
-                const next = team.nextElementSibling;
-                if (next && next.classList.contains('team')) {
-                    list.insertBefore(team, next.nextElementSibling);
-                    updateRankings(list);
-                }
-            });
-        });
-
-    function updateRankings(list) {
-        list.querySelectorAll('.divider').forEach(div => div.remove());
-
-        const teams = Array.from(list.querySelectorAll('.team'));
         teams.forEach((team, index) => {
             team.classList.remove('top-team', 'bottom-team');
 
-            const rankSpan = team.querySelector('.rank');
-            if (rankSpan) rankSpan.textContent = `${index + 1}.`;
+            const rankEl = team.querySelector('.rank');
+            rankEl.textContent = `${index + 1}.`;
 
-            if (index <= 1) team.classList.add('top-team');
-            else team.classList.add('bottom-team');
+            if (index <= 1) {
+                team.classList.add('top-team');
+            } else {
+                team.classList.add('bottom-team');
+            }
 
-            // Show/hide buttons as appropriate
+            // Hide up on first, down on last
             const upBtn = team.querySelector('.up');
             const downBtn = team.querySelector('.down');
             upBtn.classList.toggle('hidden', index === 0);
             downBtn.classList.toggle('hidden', index === teams.length - 1);
         });
 
+        // Insert divider between 2nd and 3rd
         if (teams.length >= 3) {
             const divider = document.createElement('li');
-            divider.className = 'divider';
+            divider.classList.add('divider');
             list.insertBefore(divider, teams[2]);
         }
     }
+
+    document.querySelectorAll('.team-list').forEach(list => {
+        updateTeams(list);
+
+        list.addEventListener('click', e => {
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            const team = button.closest('.team');
+            if (!team) return;
+
+            if (button.classList.contains('up')) {
+                const prev = team.previousElementSibling;
+                if (prev && prev.classList.contains('team')) {
+                    list.insertBefore(team, prev);
+                }
+            }
+
+            if (button.classList.contains('down')) {
+                const next = team.nextElementSibling;
+                if (next && next.classList.contains('team')) {
+                    list.insertBefore(next, team);
+                }
+            }
+
+            updateTeams(list);
+        });
+    });
 </script>
 </body>
 </html>
