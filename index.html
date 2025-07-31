@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <title>Team Pool Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f2;
             padding: 20px;
+            user-select: none; /* no text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         h1 {
@@ -32,6 +37,8 @@
         .pool h2 {
             margin-top: 0;
             text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .team-list {
@@ -51,6 +58,8 @@
             gap: 10px;
             transition: background 0.2s ease-in-out;
             touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .team.dragging {
@@ -60,6 +69,12 @@
         .team img {
             width: 25px;
             height: 25px;
+            user-select: none;
+            -webkit-user-drag: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            pointer-events: none; /* prevent drag ghost on mobile */
         }
 
         .rank {
@@ -68,6 +83,8 @@
             font-weight: bold;
             margin-right: 8px;
             text-align: right;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .divider {
@@ -89,26 +106,26 @@
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center;">Drag and drop the teams to rank them within their pool.</p>
+<p style="text-align:center; user-select:none; -webkit-user-select:none;">Drag and drop the teams to rank them within their pool.</p>
 
 <div class="pools">
     <div class="pool">
         <h2>Pool A</h2>
         <ul class="team-list" data-pool="A">
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png" alt="Netherlands Flag"> Netherlands</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg" alt="Belgium Flag"> Belgium</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png" alt="Spain Flag"> Spain</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg" alt="Austria Flag"> Austria</li>
         </ul>
     </div>
 
     <div class="pool">
         <h2>Pool B</h2>
         <ul class="team-list" data-pool="B">
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France</li>
-            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png" alt="Germany Flag"> Germany</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg" alt="England Flag"> England</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png" alt="France Flag"> France</li>
+            <li class="team" draggable="true"><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png" alt="Poland Flag"> Poland</li>
         </ul>
     </div>
 </div>
