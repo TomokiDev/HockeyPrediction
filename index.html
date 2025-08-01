@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             background: #f2f2f2;
             padding: 20px;
-            user-select: none; /* disable text selection */
+            user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -17,6 +17,27 @@
 
         h1 {
             text-align: center;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .toggle-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .toggle-buttons button.active {
+            background-color: #ddd;
+            font-weight: bold;
         }
 
         .pools {
@@ -47,14 +68,13 @@
         }
 
         .team {
-            padding: 10px 10px 10px 40px; /* leave space on left for number */
+            padding: 10px 10px 10px 40px;
             margin-bottom: 10px;
             background: #e8e8e8;
             border-radius: 5px;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: background 0.2s ease-in-out;
             user-select: none;
             position: relative;
         }
@@ -62,35 +82,29 @@
         .team img {
             width: 25px;
             height: 25px;
-            user-select: none;
             pointer-events: none;
         }
 
-        /* Position number styling */
         .position-number {
             position: absolute;
             left: 10px;
             font-weight: bold;
             font-size: 16px;
             color: #555;
-            user-select: none;
             width: 20px;
             text-align: center;
         }
 
-        /* Green tint top 2 */
         .team:nth-child(1),
         .team:nth-child(2) {
-            background-color: #d0f0d0; /* subtle green */
+            background-color: #d0f0d0;
         }
 
-        /* Red tint bottom 2 */
         .team:nth-child(3),
         .team:nth-child(4) {
-            background-color: #f8d0d0; /* subtle red */
+            background-color: #f8d0d0;
         }
 
-        /* Buttons container inline */
         .btn-container {
             margin-left: auto;
             display: flex;
@@ -104,7 +118,6 @@
             border-radius: 3px;
             border: 1px solid #ccc;
             background: #fff;
-            transition: background 0.2s ease-in-out;
             user-select: none;
         }
 
@@ -118,7 +131,6 @@
             pointer-events: none;
         }
 
-        /* Dividing line between 2nd and 3rd team */
         .team-list::before {
             content: "";
             position: absolute;
@@ -126,165 +138,143 @@
             right: 10px;
             height: 2px;
             background: #888;
-            top: calc((100% / 4) * 2 - 1px); /* between 2nd and 3rd */
+            top: calc((100% / 4) * 2 - 1px);
             pointer-events: none;
             border-radius: 1px;
         }
 
-        /* Mobile styles: pools stacked vertically */
         @media (max-width: 600px) {
             .pools {
                 grid-template-columns: 1fr;
             }
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 
 <h1>Group Stage Prediction</h1>
-<p style="text-align:center;">Use the up/down buttons to rank teams within their pool.</p>
+<div class="toggle-buttons">
+    <button id="mensBtn" class="active">Mens</button>
+    <button id="womensBtn">Womens</button>
+</div>
 
-<div class="pools">
-    <div class="pool">
-        <h2>Pool A</h2>
-        <ul class="team-list" data-pool="A">
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg" alt="Austria">
-                Austria
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg" alt="Belgium">
-                Belgium
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png" alt="Netherlands">
-                Netherlands
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png" alt="Spain">
-                Spain
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-        </ul>
+<div id="mensSection" class="section active">
+    <div class="pools">
+        <div class="pool">
+            <h2>Pool A</h2>
+            <ul class="team-list" data-pool="A">
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-10-2048x1365.jpg"> Austria<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
+        <div class="pool">
+            <h2>Pool B</h2>
+            <ul class="team-list" data-pool="B">
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png"> Poland<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
     </div>
+</div>
 
-    <div class="pool">
-        <h2>Pool B</h2>
-        <ul class="team-list" data-pool="B">
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg" alt="England">
-                England
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png" alt="France">
-                France
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png" alt="Germany">
-                Germany
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-            <li class="team">
-                <span class="position-number"></span>
-                <img src="https://www.countryflags.com/wp-content/uploads/poland-flag-png-large.png" alt="Poland">
-                Poland
-                <div class="btn-container">
-                    <button class="up-btn" aria-label="Move up">▲</button>
-                    <button class="down-btn" aria-label="Move down">▼</button>
-                </div>
-            </li>
-        </ul>
+<div id="womensSection" class="section">
+    <div class="pools">
+        <div class="pool">
+            <h2>Pool A</h2>
+            <ul class="team-list" data-pool="A-w">
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/france-flag-png-large.png"> France<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/germany-flag-png-large.png"> Germany<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/ireland-flag-png-large.png"> Ireland<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/netherlands-flag-png-large.png"> Netherlands<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
+        <div class="pool">
+            <h2>Pool B</h2>
+            <ul class="team-list" data-pool="B-w">
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/flag-jpg-xl-18-2048x1775.jpg"> Belgium<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/england-flag-jpg-xl.jpg"> England<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/scotland-flag-jpg-xl.jpg"> Scotland<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://www.countryflags.com/wp-content/uploads/spain-flag-png-large.png"> Spain<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
     </div>
 </div>
 
 <script>
-    // Move team up by inserting before previous sibling
     function moveUp(button) {
         const team = button.closest('.team');
         const list = team.parentElement;
         const prev = team.previousElementSibling;
-        if (!prev) return; // already at top
+        if (!prev) return;
         list.insertBefore(team, prev);
         updateTeams(list);
     }
 
-    // Move team down by inserting next sibling before current (swap)
     function moveDown(button) {
         const team = button.closest('.team');
         const list = team.parentElement;
         const next = team.nextElementSibling;
-        if (!next) return; // already at bottom
+        if (!next) return;
         list.insertBefore(next, team);
         updateTeams(list);
     }
 
-    // Update buttons visibility, numbering and coloring for a list
     function updateTeams(list) {
         const teams = Array.from(list.children);
-
         teams.forEach((team, index) => {
             const upBtn = team.querySelector('.up-btn');
             const downBtn = team.querySelector('.down-btn');
             const posNum = team.querySelector('.position-number');
-
-            // Show/hide up/down buttons appropriately
             upBtn.disabled = index === 0;
             downBtn.disabled = index === teams.length - 1;
-
-            // Update position number text
             posNum.textContent = index + 1;
         });
     }
 
-    // Attach click listeners to all buttons
     function init() {
         document.querySelectorAll('.up-btn').forEach(btn => {
             btn.addEventListener('click', () => moveUp(btn));
         });
-
         document.querySelectorAll('.down-btn').forEach(btn => {
             btn.addEventListener('click', () => moveDown(btn));
         });
-
-        // Initialize buttons state and numbering on page load
         document.querySelectorAll('.team-list').forEach(updateTeams);
     }
 
-    // Run on page load
-    window.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+
+        const mensBtn = document.getElementById('mensBtn');
+        const womensBtn = document.getElementById('womensBtn');
+        const mensSection = document.getElementById('mensSection');
+        const womensSection = document.getElementById('womensSection');
+
+        mensBtn.addEventListener('click', () => {
+            mensSection.classList.add('active');
+            womensSection.classList.remove('active');
+            mensBtn.classList.add('active');
+            womensBtn.classList.remove('active');
+        });
+
+        womensBtn.addEventListener('click', () => {
+            womensSection.classList.add('active');
+            mensSection.classList.remove('active');
+            womensBtn.classList.add('active');
+            mensBtn.classList.remove('active');
+        });
+    });
 </script>
 
 </body>
