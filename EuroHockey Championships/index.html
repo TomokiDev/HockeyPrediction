@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EHL 2025 - Final Four Bracket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .bracket {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .round {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+        .match {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            padding: 10px;
+            min-width: 180px;
+            text-align: center;
+        }
+        .team {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .team:hover {
+            background: #e0e0e0;
+        }
+        .selected {
+            background: #4caf50;
+            color: white;
+            font-weight: bold;
+        }
+        .team-img {
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>EHL 2025 Men's Bracket</h1>
+<div class="bracket">
+    <!-- Semifinals -->
+    <div class="round">
+        <h2>Semi Finals</h2>
+        <div class="match" data-match="1">
+            <div class="team" onclick="selectWinner(this, 1, 'men')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/40px-Flag_of_the_Netherlands.svg.png" width="25" height="25"> Netherlands</div>
+            <div class="team" onclick="selectWinner(this, 1, 'men')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/40px-Flag_of_France.svg.png" width="25" height="25"> France</div>
+        </div>
+        <div class="match" data-match="2">
+            <div class="team" onclick="selectWinner(this, 2, 'men')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/40px-Flag_of_Germany.svg.png" width="25" height="25"> Germany</div>
+            <div class="team" onclick="selectWinner(this, 2, 'men')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Flag_of_Spain.svg/40px-Flag_of_Spain.svg.png" width="25" height="25"> Spain</div>
+        </div>
+    </div>
+
+    <!-- Finals -->
+    <div class="round">
+        <h2>Final</h2>
+        <div class="match" data-match="3"></div>
+        <h2>3rd Place</h2>
+        <div class="match" data-match="4"></div>
+    </div>
+</div>
+
+<h1>EHL 2025 Women's Bracket</h1>
+<div class="bracket">
+    <!-- Semifinals -->
+    <div class="round">
+        <h2>Semi Finals</h2>
+        <div class="match" data-match="5">
+            <div class="team" onclick="selectWinner(this, 5, 'women')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/40px-Flag_of_the_Netherlands.svg.png" width="25" height="25"> Netherlands</div>
+            <div class="team" onclick="selectWinner(this, 5, 'women')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Flag_of_Spain.svg/40px-Flag_of_Spain.svg.png" width="25" height="25"> Spain</div>
+        </div>
+        <div class="match" data-match="6">
+            <div class="team" onclick="selectWinner(this, 6, 'women')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Belgium_%28civil%29.svg/40px-Flag_of_Belgium_%28civil%29.svg.png" width="25" height="25"> Belgium</div>
+            <div class="team" onclick="selectWinner(this, 6, 'women')"><img class="team-img" src="https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/40px-Flag_of_Germany.svg.png" width="25" height="25"> Germany</div>
+        </div>
+    </div>
+
+    <!-- Finals -->
+    <div class="round">
+        <h2>Final</h2>
+        <div class="match" data-match="7"></div>
+        <h2>3rd Place</h2>
+        <div class="match" data-match="8"></div>
+    </div>
+</div>
+
+<script>
+    const results = { men: {}, women: {} };
+    const forwardMap = { men: {}, women: {} };
+    const loserMap = { men: {}, women: {} };
+
+    function selectWinner(element, matchId, category) {
+        const matchDiv = element.parentElement;
+        const teams = matchDiv.querySelectorAll('.team');
+        if (element.classList.contains('selected')) return;
+        teams.forEach(team => team.classList.remove('selected'));
+        element.classList.add('selected');
+
+        const img = element.querySelector('img');
+        const imageUrl = img ? img.src : '';
+        const teamName = element.textContent.trim();
+        results[category][matchId] = teamName;
+        forwardMap[category][matchId] = teamName;
+
+        // Semi to Final / 3rd place
+        if ((category === 'men' && matchId <= 2) || (category === 'women' && matchId >= 5 && matchId <= 6)) {
+            const nextMatchId = category === 'men' ? (matchId === 1 ? 3 : 3) : (matchId === 5 ? 7 : 7);
+            const thirdMatchId = category === 'men' ? 4 : 8;
+
+            const pos = matchId % 2 === 0 ? 1 : 0;
+            insertTeam(category, nextMatchId, imageUrl, teamName, pos);
+
+            const otherTeam = Array.from(teams).find(team => !team.classList.contains('selected'));
+            if (otherTeam) {
+                const loserImg = otherTeam.querySelector('img');
+                const loserImageUrl = loserImg ? loserImg.src : '';
+                const loserName = otherTeam.textContent.trim();
+                insertTeam(category, thirdMatchId, loserImageUrl, loserName, pos);
+                loserMap[category][matchId] = loserName;
+            }
+        }
+    }
+
+    function insertTeam(category, matchId, imageUrl, teamName, position) {
+        const matchDiv = document.querySelector(`[data-match="${matchId}"]`);
+        let teams = matchDiv.querySelectorAll('.team');
+        for (let team of teams) {
+            if (team.textContent.trim() === teamName) return;
+        }
+        const newTeam = document.createElement('div');
+        newTeam.className = 'team';
+        newTeam.onclick = () => selectWinner(newTeam, matchId, category);
+
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.className = 'team-img';
+        img.width = 25;
+        img.height = 25;
+
+        const span = document.createElement('span');
+        span.textContent = teamName;
+
+        newTeam.appendChild(img);
+        newTeam.appendChild(span);
+
+        if (teams.length < 2) {
+            matchDiv.appendChild(newTeam);
+        } else {
+            matchDiv.replaceChild(newTeam, teams[position]);
+        }
+    }
+</script>
+</body>
+</html>
