@@ -10,9 +10,6 @@
             background: #f2f2f2;
             padding: 20px;
             user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
 
         h1 {
@@ -75,7 +72,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            user-select: none;
             position: relative;
         }
 
@@ -156,30 +152,108 @@
         .section.active {
             display: block;
         }
+
+        /* === Match Sections === */
+        .firstplace, .thirdplace {
+            max-width: 400px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .finalteam {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .finalteam:hover {
+            background: #e0e0e0;
+        }
+
+        .finalteam.selected {
+            background: #b0e0b0;
+            font-weight: bold;
+            border: 2px solid #4caf50;
+        }
+
+        .finalteam img {
+            width: 25px;
+            height: 25px;
+        }
+
+        /* Center Pool A in the Men's section */
+        #mensSection .pools {
+            display: flex;
+            justify-content: center;
+        }
+        
     </style>
 </head>
 <body>
 
-<h1>Group Stage Prediction</h1>
+<h1>Men's Finals and Women's Group Stage Prediction</h1>
 
+<div class="toggle-buttons">
+    <button id="mensBtn" class="active">Men's Pools</button>
+    <button id="womensBtn">Women's Pools</button>
+</div>
+
+<!-- Men's Pools -->
 <div id="mensSection" class="section active">
     <div class="pools">
         <div class="pool">
             <h2>Pool A</h2>
-            <ul class="team-list" data-pool="A">
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/40px-Flag_of_the_People%27s_Republic_of_China.svg.png"> China<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Flag_of_India.svg/40px-Flag_of_India.svg.png"> India<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/40px-Flag_of_Japan.svg.png"> Japan<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/40px-Flag_of_Kazakhstan.svg.png"> Kazakhstan<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            <ul class="team-list" data-pool="A-men">
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"> China<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"> India<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/40px-Flag_of_Malaysia.svg.png"> Malaysia<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/40px-Flag_of_South_Korea.svg.png"> South Korea<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="firstplace">
+        <h2>1st place match</h2>
+        <div class="match" id="firstMatch"></div>
+    </div>
+
+    <div class="thirdplace">
+        <h2>3rd place match</h2>
+        <div class="match" id="thirdMatch"></div>
+    </div>
+</div>
+
+<!-- Women's Pools -->
+<div id="womensSection" class="section">
+    <div class="pools">
+        <div class="pool">
+            <h2>Pool A</h2>
+            <ul class="team-list" data-pool="A-women">
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"> China<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Chinese_Taipei_for_Olympic_Games.svg"> Chinese Taipei<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Flag_of_Malaysia.svg"> Malaysia<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg"> South Korea<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+
             </ul>
         </div>
         <div class="pool">
             <h2>Pool B</h2>
-            <ul class="team-list" data-pool="B">
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Flag_of_Bangladesh.svg/40px-Flag_of_Bangladesh.svg.png"> Bangladesh<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Chinese_Taipei_for_Olympic_Games.svg/40px-Flag_of_Chinese_Taipei_for_Olympic_Games.svg.png"> Chinese Taipei<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/40px-Flag_of_Malaysia.svg.png"> Malaysia<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/40px-Flag_of_South_Korea.svg.png"> South Korea<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            <ul class="team-list" data-pool="B-women">
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg"> Japan<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"> India<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_Thailand.svg/40px-Flag_of_Thailand.svg.png"> Thailand<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Singapore.svg/40px-Flag_of_Singapore.svg.png"> Singapore<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
             </ul>
         </div>
     </div>
@@ -214,6 +288,61 @@
             downBtn.disabled = index === teams.length - 1;
             posNum.textContent = index + 1;
         });
+
+        // If this is the men's pool, update matches
+        if (list.dataset.pool === "A-men") {
+            updateMatches(teams);
+        }
+    }
+
+    function updateMatches(teams) {
+        const firstMatch = document.getElementById('firstMatch');
+        const thirdMatch = document.getElementById('thirdMatch');
+
+        firstMatch.innerHTML = '';
+        thirdMatch.innerHTML = '';
+
+        if (teams.length >= 4) {
+            const first = teams[0];
+            const second = teams[1];
+            const third = teams[2];
+            const fourth = teams[3];
+
+            [first, second].forEach(t => firstMatch.appendChild(createFinalTeam(t)));
+            [third, fourth].forEach(t => thirdMatch.appendChild(createFinalTeam(t)));
+
+            attachSelection(firstMatch);
+            attachSelection(thirdMatch);
+        }
+    }
+
+    function createFinalTeam(team) {
+        const div = document.createElement('div');
+        div.classList.add('finalteam');
+
+        // Clone the flag image
+        const img = team.querySelector('img').cloneNode(true);
+
+        // Get the team name only (exclude numbers and arrow text)
+        const nameNode = team.cloneNode(true);
+        nameNode.querySelector('.btn-container').remove();
+        nameNode.querySelector('.position-number').remove();
+        const teamName = nameNode.textContent.trim();
+
+        // Append to card
+        div.appendChild(img);
+        div.appendChild(document.createTextNode(teamName));
+        return div;
+    }
+
+    function attachSelection(matchDiv) {
+        const teams = matchDiv.querySelectorAll('.finalteam');
+        teams.forEach(team => {
+            team.addEventListener('click', () => {
+                teams.forEach(t => t.classList.remove('selected'));
+                team.classList.add('selected');
+            });
+        });
     }
 
     function init() {
@@ -224,20 +353,29 @@
             btn.addEventListener('click', () => moveDown(btn));
         });
         document.querySelectorAll('.team-list').forEach(updateTeams);
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        init();
-
+        // Toggle sections
         const mensBtn = document.getElementById('mensBtn');
+        const womensBtn = document.getElementById('womensBtn');
         const mensSection = document.getElementById('mensSection');
+        const womensSection = document.getElementById('womensSection');
 
         mensBtn.addEventListener('click', () => {
             mensSection.classList.add('active');
+            womensSection.classList.remove('active');
             mensBtn.classList.add('active');
+            womensBtn.classList.remove('active');
         });
-        
-    });
+
+        womensBtn.addEventListener('click', () => {
+            womensSection.classList.add('active');
+            mensSection.classList.remove('active');
+            womensBtn.classList.add('active');
+            mensBtn.classList.remove('active');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
