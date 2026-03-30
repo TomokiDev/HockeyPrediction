@@ -1,334 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Team Pool Prediction</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EHL 2026 Bracket</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            padding: 20px;
-            user-select: none;
+          font-family: Arial, sans-serif;
+          background: #f4f4f4;
+          color: #111;
+          padding: 20px 20px 40px;
         }
 
-        h1 {
-            text-align: center;
+        h1 { font-size: 1.5rem; margin-bottom: 6px; }
+        h2 { font-size: 0.9rem; color: #777; font-weight: normal; margin-bottom: 16px; }
+
+        .section { margin-bottom: 48px; }
+
+        .bracket {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          width: 100%;
         }
 
-        .toggle-buttons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
+        .round {
+          flex: 1;
+          min-width: 0; /* allow shrinking below content size */
         }
 
-        .toggle-buttons button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: pointer;
-            border-radius: 5px;
+        .round-label {
+          font-size: 0.7rem;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #888;
+          margin-bottom: 10px;
+          border-bottom: 1px solid #ccc;
+          padding-bottom: 6px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .toggle-buttons button.active {
-            background-color: #ddd;
-            font-weight: bold;
-        }
+        .matches { display: flex; flex-direction: column; gap: 12px; }
 
-        .pools {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            max-width: 800px;
-            margin: auto;
-        }
+        /* vertical offset so SF/Final align centrally */
+        .round.sf  .matches { padding-top: 38px; }
+        .round.fin .matches { padding-top: 0; }
 
-        .pool {
-            margin: 0 0 -10px;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .pool h2 {
-            margin-top: 0;
-            text-align: center;
-        }
-
-        .team-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
+        .match {
+          background: #fff;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          width: 100%;
+          overflow: hidden;
         }
 
         .team {
-            padding: 10px 10px 10px 40px;
-            margin-bottom: 10px;
-            background: #e8e8e8;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 7px 9px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          border-top: 1px solid #e8e8e8;
+          transition: background 0.1s;
+          user-select: none;
+        }
+        .team:first-child { border-top: none; }
+        .team:hover { background: #f0f0f0; }
+
+        .team.selected {
+          background: #e8f5e9;
+          color: #2a7a2a;
+          font-weight: bold;
+        }
+        .team.selected .team-name::after {
+          content: ' ✓';
+          font-size: 0.7rem;
+          color: #4caf50;
         }
 
-        .team img {
-            width: 25px;
-            height: 25px;
-            pointer-events: none;
+        .team-img {
+          width: 22px;
+          height: 22px;
+          object-fit: contain;
+          flex-shrink: 0;
+        }
+        .team-name { flex: 1; }
+
+        .slot-empty {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 7px 9px;
+          font-size: 0.78rem;
+          color: #bbb;
+          font-style: italic;
+          border-top: 1px solid #e8e8e8;
+        }
+        .slot-empty:first-child { border-top: none; }
+        .slot-empty .dot {
+          width: 22px; height: 22px;
+          border: 1px dashed #ccc;
+          border-radius: 3px;
+          flex-shrink: 0;
         }
 
-        .position-number {
-            position: absolute;
-            left: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            color: #555;
-            width: 20px;
-            text-align: center;
+        .final-group { display: flex; flex-direction: column; gap: 30px; }
+        .final-sublabel {
+          font-size: 0.65rem;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #888;
+          margin-bottom: 6px;
         }
 
-        .team:nth-child(1),
-        .team:nth-child(2) {
-            background-color: #d0f0d0;
+        .champion-banner {
+          display: none;
+          margin-top: 8px;
+          padding: 7px 10px;
+          border-radius: 5px;
+          font-size: 0.78rem;
+          font-weight: bold;
+          background: #e8f5e9;
+          color: #2a7a2a;
+          border: 1px solid #a5d6a7;
         }
-
-        .team:nth-child(3),
-        .team:nth-child(4) {
-            background-color: #f8d0d0;
-        }
-
-        .btn-container {
-            margin-left: auto;
-            display: flex;
-            gap: 5px;
-        }
-
-        button {
-            padding: 4px 8px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 3px;
-            border: 1px solid #ccc;
-            background: #fff;
-            user-select: none;
-        }
-
-        button:hover:not(:disabled) {
-            background: #eee;
-        }
-
-        button:disabled {
-            cursor: default;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .team-list::before {
-            content: "";
-            position: absolute;
-            left: 10px;
-            right: 10px;
-            height: 2px;
-            background: #888;
-            top: calc((100% / 4) * 2 - 1px);
-            pointer-events: none;
-            border-radius: 1px;
-        }
-
-        @media (max-width: 600px) {
-            .pools {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        /* === Match Sections === */
-        .firstplace, .thirdplace {
-            max-width: 400px;
-            margin: 30px auto -10px;
-            background: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 0 8px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-
-        .finalteam {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            background: #f0f0f0;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .finalteam:hover {
-            background: #e0e0e0;
-        }
-
-        .finalteam.selected {
-            background: #b0e0b0;
-            font-weight: bold;
-            border: 2px solid #4caf50;
-        }
-
-        .finalteam img {
-            width: 25px;
-            height: 25px;
-        }
-
-        /* Center Pool A in the Men's section */
-        #mensSection .pools {
-            display: flex;
-            justify-content: center;
-        }
-        
+        .champion-banner.visible { display: block; }
     </style>
 </head>
 <body>
 
-<h1>Women's Finals</h1>
+<!-- ═══════════ MEN'S BRACKET ═══════════ -->
+<div class="section">
+    <h1>EHL 2026 Men's Bracket</h1>
+    <h2>Click a team to advance them to the next round</h2>
 
-<!-- Men's Pools -->
-<div id="mensSection" class="section active">
-    <div class="pools">
-        <div class="pool">
-            <h2>Super 4s pool</h2>
-            <ul class="team-list" data-pool="A-men">
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"> China<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"> India<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/40px-Flag_of_South_Korea.svg.png"> South Korea<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/40px-Flag_of_Japan.svg.png"> Japan<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
-            </ul>
+    <div class="bracket">
+
+        <!-- QF -->
+        <div class="round">
+            <div class="round-label">Quarter Finals</div>
+            <div class="matches">
+
+                <div class="match" data-match="m1">
+                    <div class="team" data-slot="0" data-team="SV Kampong"     data-img="https://ehlhockey.tv/wp-content/uploads/2023/07/SV-Kampong.png"                        onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2023/07/SV-Kampong.png"                        onerror="this.style.display='none'"><span class="team-name">SV Kampong</span></div>
+                    <div class="team" data-slot="1" data-team="Surbiton HC"    data-img="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png"                           onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png"                           onerror="this.style.display='none'"><span class="team-name">Surbiton HC</span></div>
+                </div>
+
+                <div class="match" data-match="m2">
+                    <div class="team" data-slot="0" data-team="HC Bloemendaal" data-img="https://ehlhockey.tv/wp-content/uploads/2023/03/HC-Bloemendaal.png"                     onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2023/03/HC-Bloemendaal.png"                     onerror="this.style.display='none'"><span class="team-name">HC Bloemendaal</span></div>
+                    <div class="team" data-slot="1" data-team="Club de Campo"  data-img="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png"     onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png"     onerror="this.style.display='none'"><span class="team-name">Club de Campo</span></div>
+                </div>
+
+                <div class="match" data-match="m3">
+                    <div class="team" data-slot="0" data-team="Old Georgians HC" data-img="https://ehlhockey.tv/wp-content/uploads/2022/07/old-georgians.jpeg"                   onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/old-georgians.jpeg"                   onerror="this.style.display='none'"><span class="team-name">Old Georgians HC</span></div>
+                    <div class="team" data-slot="1" data-team="HC Rotterdam"   data-img="https://ehlhockey.tv/wp-content/uploads/2021/12/HC-Rotterdam-NED-500x500-1.png"         onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/12/HC-Rotterdam-NED-500x500-1.png"         onerror="this.style.display='none'"><span class="team-name">HC Rotterdam</span></div>
+                </div>
+
+                <div class="match" data-match="m4">
+                    <div class="team" data-slot="0" data-team="Royal Léopold"  data-img="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsRoyal-Leopold.png"            onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsRoyal-Leopold.png"            onerror="this.style.display='none'"><span class="team-name">Royal Léopold</span></div>
+                    <div class="team" data-slot="1" data-team="Gantoise HC"    data-img="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png"                       onclick="menPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png"                       onerror="this.style.display='none'"><span class="team-name">Gantoise HC</span></div>
+                </div>
+
+            </div>
         </div>
-    </div>
 
-    <div class="firstplace">
-        <h2>1st place match</h2>
-        <div class="match" id="firstMatch"></div>
-    </div>
+        <!-- SF -->
+        <div class="round sf">
+            <div class="round-label">Semi Finals</div>
+            <div class="matches">
+                <div class="match" data-match="m5">
+                    <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner QF 1</div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner QF 2</div>
+                </div>
+                <div class="match" data-match="m6">
+                    <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner QF 3</div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner QF 4</div>
+                </div>
+            </div>
+        </div>
 
-    <div class="thirdplace">
-        <h2>3rd place match</h2>
-        <div class="match" id="thirdMatch"></div>
+        <!-- Final + 3rd -->
+        <div class="round fin">
+            <div class="round-label">Finals</div>
+            <div class="final-group">
+                <div>
+                    <div class="final-sublabel">🏆 Final</div>
+                    <div class="match" data-match="m7">
+                        <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner SF 1</div>
+                        <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner SF 2</div>
+                    </div>
+                    <div class="champion-banner" id="men-champion"></div>
+                </div>
+                <div>
+                    <div class="final-sublabel">🥉 Third Place</div>
+                    <div class="match" data-match="m8">
+                        <div class="slot-empty" data-slot="0"><div class="dot"></div>Loser SF 1</div>
+                        <div class="slot-empty" data-slot="1"><div class="dot"></div>Loser SF 2</div>
+                    </div>
+                    <div class="champion-banner" id="men-third"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ═══════════ WOMEN'S BRACKET ═══════════ -->
+<div class="section">
+    <h1>EHL 2026 Women's Bracket</h1>
+    <h2>Click a team to advance them to the next round</h2>
+
+    <div class="bracket">
+
+        <!-- Play-ins -->
+        <div class="round">
+            <div class="round-label">Play-ins</div>
+            <div class="matches">
+
+                <div class="match" data-match="w1">
+                    <div class="team" data-slot="0" data-team="Railway Union HC" data-img="https://ehlhockey.tv/wp-content/uploads/2024/10/Railway-Union.png"                    onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/Railway-Union.png"                    onerror="this.style.display='none'"><span class="team-name">Railway Union HC</span></div>
+                    <div class="team" data-slot="1" data-team="SCHC"              data-img="https://ehlhockey.tv/wp-content/uploads/2022/11/SCHC-NED-360x360-1.jpeg"             onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/11/SCHC-NED-360x360-1.jpeg"             onerror="this.style.display='none'"><span class="team-name">SCHC</span></div>
+                </div>
+
+                <div class="match" data-match="w2">
+                    <div class="team" data-slot="0" data-team="Mannheimer HC"   data-img="https://ehlhockey.tv/wp-content/uploads/2021/07/Mannheimer.gif"                        onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Mannheimer.gif"                        onerror="this.style.display='none'"><span class="team-name">Mannheimer HC</span></div>
+                    <div class="team" data-slot="1" data-team="MSC Sumchanka"   data-img="https://ehlhockey.tv/wp-content/uploads/2024/10/sumchanka.jpg"                         onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/sumchanka.jpg"                         onerror="this.style.display='none'"><span class="team-name">MSC Sumchanka</span></div>
+                </div>
+
+                <div class="match" data-match="w3">
+                    <div class="team" data-slot="0" data-team="Club de Campo W"  data-img="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png"   onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/07/Team_IconsClub-de-Campo-Madrid.png"   onerror="this.style.display='none'"><span class="team-name">Club de Campo</span></div>
+                    <div class="team" data-slot="1" data-team="Braxgata HC"      data-img="https://ehlhockey.tv/wp-content/uploads/2024/10/Braxgata.jpeg"                        onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/10/Braxgata.jpeg"                        onerror="this.style.display='none'"><span class="team-name">Braxgata HC</span></div>
+                </div>
+
+                <div class="match" data-match="w4">
+                    <div class="team" data-slot="0" data-team="SK Slavia Prague"  data-img="https://ehlhockey.tv/wp-content/uploads/2022/07/SK-Slavia-Prague-CZE-449x500-1.jpeg" onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/SK-Slavia-Prague-CZE-449x500-1.jpeg" onerror="this.style.display='none'"><span class="team-name">SK Slavia Prague</span></div>
+                    <div class="team" data-slot="1" data-team="Surbiton HC W"    data-img="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png"                         onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2024/07/Surbiton.png"                         onerror="this.style.display='none'"><span class="team-name">Surbiton HC</span></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- QF -->
+        <div class="round">
+            <div class="round-label">Quarter Finals</div>
+            <div class="matches">
+
+                <div class="match" data-match="w5">
+                    <div class="team" data-slot="0" data-team="HC 's-Hertogenbosch" data-img="https://ehlhockey.tv/wp-content/uploads/2019/10/Den-Bosch.png" onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2019/10/Den-Bosch.png" onerror="this.style.display='none'"><span class="team-name">HC 's-Hertogenbosch</span></div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner PI 1</div>
+                </div>
+
+                <div class="match" data-match="w6">
+                    <div class="team" data-slot="0" data-team="Gantoise W" data-img="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2022/07/Gantoise-NEW.png" onerror="this.style.display='none'"><span class="team-name">Gantoise</span></div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner PI 2</div>
+                </div>
+
+                <div class="match" data-match="w7">
+                    <div class="team" data-slot="0" data-team="Real Club de Polo" data-img="https://ehlhockey.tv/wp-content/uploads/2021/03/Real-Club-de-Polo.png" onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/03/Real-Club-de-Polo.png" onerror="this.style.display='none'"><span class="team-name">Real Club de Polo</span></div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner PI 3</div>
+                </div>
+
+                <div class="match" data-match="w8">
+                    <div class="team" data-slot="0" data-team="Düsseldorfer HC" data-img="https://ehlhockey.tv/wp-content/uploads/2021/12/dusseldorf.png" onclick="womenPick(this)"><img class="team-img" src="https://ehlhockey.tv/wp-content/uploads/2021/12/dusseldorf.png" onerror="this.style.display='none'"><span class="team-name">Düsseldorfer HC</span></div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner PI 4</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SF -->
+        <div class="round sf">
+            <div class="round-label">Semi Finals</div>
+            <div class="matches">
+                <div class="match" data-match="w9">
+                    <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner QF 1</div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner QF 2</div>
+                </div>
+                <div class="match" data-match="w10">
+                    <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner QF 3</div>
+                    <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner QF 4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final + 3rd -->
+        <div class="round fin">
+            <div class="round-label">Finals</div>
+            <div class="final-group">
+                <div>
+                    <div class="final-sublabel">🏆 Final</div>
+                    <div class="match" data-match="w11">
+                        <div class="slot-empty" data-slot="0"><div class="dot"></div>Winner SF 1</div>
+                        <div class="slot-empty" data-slot="1"><div class="dot"></div>Winner SF 2</div>
+                    </div>
+                    <div class="champion-banner" id="women-champion"></div>
+                </div>
+                <div>
+                    <div class="final-sublabel">🥉 Third Place</div>
+                    <div class="match" data-match="w12">
+                        <div class="slot-empty" data-slot="0"><div class="dot"></div>Loser SF 1</div>
+                        <div class="slot-empty" data-slot="1"><div class="dot"></div>Loser SF 2</div>
+                    </div>
+                    <div class="champion-banner" id="women-third"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-    function moveUp(button) {
-        const team = button.closest('.team');
-        const list = team.parentElement;
-        const prev = team.previousElementSibling;
-        if (!prev) return;
-        list.insertBefore(team, prev);
-        updateTeams(list);
+    /* ─────────────────────────────────────────────────────
+       CORE SLOT HELPERS
+       Every row (team or empty placeholder) has data-slot="0"
+       or data-slot="1". We always find/replace by that attribute
+       so child-index confusion is impossible.
+       ───────────────────────────────────────────────────── */
+
+    function getSlotEl(matchDiv, slotIdx) {
+      return matchDiv.querySelector(`[data-slot="${slotIdx}"]`);
     }
 
-    function moveDown(button) {
-        const team = button.closest('.team');
-        const list = team.parentElement;
-        const next = team.nextElementSibling;
-        if (!next) return;
-        list.insertBefore(next, team);
-        updateTeams(list);
+    function fillSlot(matchDiv, slotIdx, teamName, imgSrc, clickFn) {
+      const el = document.createElement('div');
+      el.className = 'team';
+      el.dataset.slot = slotIdx;
+      el.dataset.team = teamName;
+      el.dataset.img  = imgSrc;
+      el.onclick = () => clickFn(el);
+
+      const img = document.createElement('img');
+      img.className = 'team-img';
+      img.src = imgSrc;
+      img.onerror = () => { img.style.display = 'none'; };
+
+      const span = document.createElement('span');
+      span.className = 'team-name';
+      span.textContent = teamName;
+
+      el.appendChild(img);
+      el.appendChild(span);
+
+      const existing = getSlotEl(matchDiv, slotIdx);
+      if (existing) matchDiv.replaceChild(el, existing);
+      else          matchDiv.appendChild(el);
     }
 
-    function updateTeams(list) {
-        const teams = Array.from(list.children);
-        teams.forEach((team, index) => {
-            const upBtn = team.querySelector('.up-btn');
-            const downBtn = team.querySelector('.down-btn');
-            const posNum = team.querySelector('.position-number');
-            upBtn.disabled = index === 0;
-            downBtn.disabled = index === teams.length - 1;
-            posNum.textContent = index + 1;
-        });
+    function clearSlot(matchDiv, slotIdx, label) {
+      const el = document.createElement('div');
+      el.className = 'slot-empty';
+      el.dataset.slot = slotIdx;
+      el.innerHTML = `<div class="dot"></div>${label}`;
 
-        // If this is the men's pool, update matches
-        if (list.dataset.pool === "A-men") {
-            updateMatches(teams);
+      const existing = getSlotEl(matchDiv, slotIdx);
+      if (existing) matchDiv.replaceChild(el, existing);
+      else          matchDiv.appendChild(el);
+    }
+
+    function getMatch(id) {
+      return document.querySelector(`[data-match="${id}"]`);
+    }
+
+    function showBanner(id, text) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.classList.add('visible');
+    }
+    function hideBanner(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    /* ─────────────────────────────────────────────────────
+       MEN'S BRACKET
+       m1–m4 = QF, m5–m6 = SF, m7 = Final, m8 = 3rd Place
+       ───────────────────────────────────────────────────── */
+
+    const mW = {}; // matchId -> { team, img }  (winner state)
+    const mL = {}; // matchId -> { team, img }  (loser state, SF only)
+
+    // Where does the winner of each match go, and which slot?
+    const M_NEXT  = { m1:'m5', m2:'m5', m3:'m6', m4:'m6', m5:'m7', m6:'m7' };
+    const M_SLOT  = { m1:0,    m2:1,    m3:0,    m4:1,    m5:0,    m6:1    };
+    const M_LABEL = {
+      m1:'Winner QF 1', m2:'Winner QF 2', m3:'Winner QF 3', m4:'Winner QF 4',
+      m5:'Winner SF 1', m6:'Winner SF 2'
+    };
+    const M_LOSER_LABEL = { m5:'Loser SF 1', m6:'Loser SF 2' };
+
+    function menPick(el) {
+      const matchDiv = el.closest('.match');
+      const matchId  = matchDiv.dataset.match;
+
+      // Highlight
+      matchDiv.querySelectorAll('.team').forEach(t => t.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const team = el.dataset.team;
+      const img  = el.dataset.img;
+
+      if (['m1','m2','m3','m4'].includes(matchId)) {
+        // QF → SF
+        const sfId   = M_NEXT[matchId];
+        const sfSlot = M_SLOT[matchId];
+        const prev   = mW[matchId];
+        if (prev && prev.team !== team) {
+          // Changing pick: remove old from SF and cascade
+          clearSlot(getMatch(sfId), sfSlot, M_LABEL[matchId]);
+          menCascadeSF(sfId, sfSlot);
         }
-    }
+        mW[matchId] = { team, img };
+        fillSlot(getMatch(sfId), sfSlot, team, img, menPick);
 
-    function updateMatches(teams) {
-        const firstMatch = document.getElementById('firstMatch');
-        const thirdMatch = document.getElementById('thirdMatch');
+      } else if (['m5','m6'].includes(matchId)) {
+        // SF → Final + 3rd
+        const fSlot = M_SLOT[matchId];
+        const prev  = mW[matchId];
+        if (prev) clearSlot(getMatch('m7'), fSlot, M_LABEL[matchId]);
+        if (mL[matchId]) clearSlot(getMatch('m8'), fSlot, M_LOSER_LABEL[matchId]);
+        hideBanner('men-champion');
+        hideBanner('men-third');
 
-        firstMatch.innerHTML = '';
-        thirdMatch.innerHTML = '';
+        mW[matchId] = { team, img };
+        fillSlot(getMatch('m7'), fSlot, team, img, menPick);
 
-        if (teams.length >= 4) {
-            const first = teams[0];
-            const second = teams[1];
-            const third = teams[2];
-            const fourth = teams[3];
-
-            [first, second].forEach(t => firstMatch.appendChild(createFinalTeam(t)));
-            [third, fourth].forEach(t => thirdMatch.appendChild(createFinalTeam(t)));
-
-            attachSelection(firstMatch);
-            attachSelection(thirdMatch);
+        // Loser → 3rd place
+        const loserEl = Array.from(matchDiv.querySelectorAll('.team')).find(t => !t.classList.contains('selected'));
+        if (loserEl) {
+          mL[matchId] = { team: loserEl.dataset.team, img: loserEl.dataset.img };
+          fillSlot(getMatch('m8'), fSlot, loserEl.dataset.team, loserEl.dataset.img, menPick);
         }
+
+      } else if (matchId === 'm7') {
+        showBanner('men-champion', `🏆 Champion: ${team}`);
+      } else if (matchId === 'm8') {
+        showBanner('men-third', `🥉 Third Place: ${team}`);
+      }
     }
 
-    function createFinalTeam(team) {
-        const div = document.createElement('div');
-        div.classList.add('finalteam');
-
-        // Clone the flag image
-        const img = team.querySelector('img').cloneNode(true);
-
-        // Get the team name only (exclude numbers and arrow text)
-        const nameNode = team.cloneNode(true);
-        nameNode.querySelector('.btn-container').remove();
-        nameNode.querySelector('.position-number').remove();
-        const teamName = nameNode.textContent.trim();
-
-        // Append to card
-        div.appendChild(img);
-        div.appendChild(document.createTextNode(teamName));
-        return div;
+    function menCascadeSF(sfId, sfSlot) {
+      // If SF had a winner forwarded to Final, clear that too
+      const prev = mW[sfId];
+      if (prev) {
+        clearSlot(getMatch('m7'), M_SLOT[sfId], M_LABEL[sfId]);
+        delete mW[sfId];
+      }
+      if (mL[sfId]) {
+        clearSlot(getMatch('m8'), M_SLOT[sfId], M_LOSER_LABEL[sfId]);
+        delete mL[sfId];
+      }
+      hideBanner('men-champion');
+      hideBanner('men-third');
+      // Deselect teams in that SF match so it looks "fresh"
+      getMatch(sfId).querySelectorAll('.team').forEach(t => t.classList.remove('selected'));
     }
 
-    function attachSelection(matchDiv) {
-        const teams = matchDiv.querySelectorAll('.finalteam');
-        teams.forEach(team => {
-            team.addEventListener('click', () => {
-                teams.forEach(t => t.classList.remove('selected'));
-                team.classList.add('selected');
-            });
-        });
+    /* ─────────────────────────────────────────────────────
+       WOMEN'S BRACKET
+       w1–w4 = PI, w5–w8 = QF, w9–w10 = SF, w11 = Final, w12 = 3rd
+       ───────────────────────────────────────────────────── */
+
+    const wW = {};
+    const wL = {};
+
+    const W_PI_QF   = { w1:'w5', w2:'w6', w3:'w7', w4:'w8' };         // PI winner → QF match
+    const W_QF_SF   = { w5:'w9', w6:'w9', w7:'w10', w8:'w10' };       // QF winner → SF match
+    const W_QF_SLOT = { w5:0, w6:1, w7:0, w8:1 };                     // slot in SF
+    const W_SF_SLOT = { w9:0, w10:1 };                                 // slot in Final/3rd
+
+    const W_PI_LABEL  = { w1:'Winner PI 1', w2:'Winner PI 2', w3:'Winner PI 3', w4:'Winner PI 4' };
+    const W_QF_LABEL  = { w5:'Winner QF 1', w6:'Winner QF 2', w7:'Winner QF 3', w8:'Winner QF 4' };
+    const W_SF_LABEL  = { w9:'Winner SF 1', w10:'Winner SF 2' };
+    const W_SFL_LABEL = { w9:'Loser SF 1',  w10:'Loser SF 2'  };
+
+    function womenPick(el) {
+      const matchDiv = el.closest('.match');
+      const matchId  = matchDiv.dataset.match;
+
+      matchDiv.querySelectorAll('.team').forEach(t => t.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const team = el.dataset.team;
+      const img  = el.dataset.img;
+
+      if (['w1','w2','w3','w4'].includes(matchId)) {
+        // PI → QF slot 1 (seeded team is always slot 0)
+        const qfId = W_PI_QF[matchId];
+        const prev = wW[matchId];
+        if (prev && prev.team !== team) {
+          clearSlot(getMatch(qfId), 1, W_PI_LABEL[matchId]);
+          womenCascadeQF(qfId);
+        }
+        wW[matchId] = { team, img };
+        fillSlot(getMatch(qfId), 1, team, img, womenPick);
+
+      } else if (['w5','w6','w7','w8'].includes(matchId)) {
+        // QF → SF
+        const sfId   = W_QF_SF[matchId];
+        const sfSlot = W_QF_SLOT[matchId];
+        const prev   = wW[matchId];
+        if (prev && prev.team !== team) {
+          clearSlot(getMatch(sfId), sfSlot, W_QF_LABEL[matchId]);
+          womenCascadeSF(sfId);
+        }
+        wW[matchId] = { team, img };
+        fillSlot(getMatch(sfId), sfSlot, team, img, womenPick);
+
+      } else if (['w9','w10'].includes(matchId)) {
+        // SF → Final + 3rd
+        const fSlot = W_SF_SLOT[matchId];
+        const prev  = wW[matchId];
+        if (prev)      clearSlot(getMatch('w11'), fSlot, W_SF_LABEL[matchId]);
+        if (wL[matchId]) clearSlot(getMatch('w12'), fSlot, W_SFL_LABEL[matchId]);
+        hideBanner('women-champion');
+        hideBanner('women-third');
+
+        wW[matchId] = { team, img };
+        fillSlot(getMatch('w11'), fSlot, team, img, womenPick);
+
+        const loserEl = Array.from(matchDiv.querySelectorAll('.team')).find(t => !t.classList.contains('selected'));
+        if (loserEl) {
+          wL[matchId] = { team: loserEl.dataset.team, img: loserEl.dataset.img };
+          fillSlot(getMatch('w12'), fSlot, loserEl.dataset.team, loserEl.dataset.img, womenPick);
+        }
+
+      } else if (matchId === 'w11') {
+        showBanner('women-champion', `🏆 Champion: ${team}`);
+      } else if (matchId === 'w12') {
+        showBanner('women-third', `🥉 Third Place: ${team}`);
+      }
     }
 
-    function init() {
-        document.querySelectorAll('.up-btn').forEach(btn => {
-            btn.addEventListener('click', () => moveUp(btn));
-        });
-        document.querySelectorAll('.down-btn').forEach(btn => {
-            btn.addEventListener('click', () => moveDown(btn));
-        });
-        document.querySelectorAll('.team-list').forEach(updateTeams);
-        
+    function womenCascadeQF(qfId) {
+      const prev = wW[qfId];
+      if (prev) {
+        const sfId   = W_QF_SF[qfId];
+        const sfSlot = W_QF_SLOT[qfId];
+        clearSlot(getMatch(sfId), sfSlot, W_QF_LABEL[qfId]);
+        womenCascadeSF(sfId);
+        delete wW[qfId];
+        getMatch(qfId).querySelectorAll('.team').forEach(t => t.classList.remove('selected'));
+      }
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    function womenCascadeSF(sfId) {
+      const prev = wW[sfId];
+      const fSlot = W_SF_SLOT[sfId];
+      if (prev) {
+        clearSlot(getMatch('w11'), fSlot, W_SF_LABEL[sfId]);
+        delete wW[sfId];
+      }
+      if (wL[sfId]) {
+        clearSlot(getMatch('w12'), fSlot, W_SFL_LABEL[sfId]);
+        delete wL[sfId];
+      }
+      hideBanner('women-champion');
+      hideBanner('women-third');
+      getMatch(sfId).querySelectorAll('.team').forEach(t => t.classList.remove('selected'));
+    }
 </script>
-
 </body>
 </html>

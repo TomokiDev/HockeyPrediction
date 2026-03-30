@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Team Pool Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 20px;
+            user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .toggle-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .toggle-buttons button.active {
+            background-color: #ddd;
+            font-weight: bold;
+        }
+
+        .pools {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .pool {
+            margin: 0 0 -10px;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pool h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .team-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+
+        .team {
+            padding: 10px 10px 10px 40px;
+            margin-bottom: 10px;
+            background: #e8e8e8;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .team img {
+            width: 25px;
+            height: 25px;
+            pointer-events: none;
+        }
+
+        .position-number {
+            position: absolute;
+            left: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #555;
+            width: 20px;
+            text-align: center;
+        }
+
+        .team:nth-child(1),
+        .team:nth-child(2) {
+            background-color: #d0f0d0;
+        }
+
+        .team:nth-child(3),
+        .team:nth-child(4) {
+            background-color: #f8d0d0;
+        }
+
+        .btn-container {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+        }
+
+        button {
+            padding: 4px 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            background: #fff;
+            user-select: none;
+        }
+
+        button:hover:not(:disabled) {
+            background: #eee;
+        }
+
+        button:disabled {
+            cursor: default;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .team-list::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: #888;
+            top: calc((100% / 4) * 2 - 1px);
+            pointer-events: none;
+            border-radius: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .pools {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* === Match Sections === */
+        .firstplace, .thirdplace {
+            max-width: 400px;
+            margin: 30px auto -10px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .finalteam {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .finalteam:hover {
+            background: #e0e0e0;
+        }
+
+        .finalteam.selected {
+            background: #b0e0b0;
+            font-weight: bold;
+            border: 2px solid #4caf50;
+        }
+
+        .finalteam img {
+            width: 25px;
+            height: 25px;
+        }
+
+        /* Center Pool A in the Men's section */
+        #mensSection .pools {
+            display: flex;
+            justify-content: center;
+        }
+        
+    </style>
+</head>
+<body>
+
+<h1>Women's Finals</h1>
+
+<!-- Men's Pools -->
+<div id="mensSection" class="section active">
+    <div class="pools">
+        <div class="pool">
+            <h2>Super 4s pool</h2>
+            <ul class="team-list" data-pool="A-men">
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"> China<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"> India<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/40px-Flag_of_South_Korea.svg.png"> South Korea<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+                <li class="team"><span class="position-number"></span><img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/40px-Flag_of_Japan.svg.png"> Japan<div class="btn-container"><button class="up-btn">▲</button><button class="down-btn">▼</button></div></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="firstplace">
+        <h2>1st place match</h2>
+        <div class="match" id="firstMatch"></div>
+    </div>
+
+    <div class="thirdplace">
+        <h2>3rd place match</h2>
+        <div class="match" id="thirdMatch"></div>
+    </div>
+</div>
+
+<script>
+    function moveUp(button) {
+        const team = button.closest('.team');
+        const list = team.parentElement;
+        const prev = team.previousElementSibling;
+        if (!prev) return;
+        list.insertBefore(team, prev);
+        updateTeams(list);
+    }
+
+    function moveDown(button) {
+        const team = button.closest('.team');
+        const list = team.parentElement;
+        const next = team.nextElementSibling;
+        if (!next) return;
+        list.insertBefore(next, team);
+        updateTeams(list);
+    }
+
+    function updateTeams(list) {
+        const teams = Array.from(list.children);
+        teams.forEach((team, index) => {
+            const upBtn = team.querySelector('.up-btn');
+            const downBtn = team.querySelector('.down-btn');
+            const posNum = team.querySelector('.position-number');
+            upBtn.disabled = index === 0;
+            downBtn.disabled = index === teams.length - 1;
+            posNum.textContent = index + 1;
+        });
+
+        // If this is the men's pool, update matches
+        if (list.dataset.pool === "A-men") {
+            updateMatches(teams);
+        }
+    }
+
+    function updateMatches(teams) {
+        const firstMatch = document.getElementById('firstMatch');
+        const thirdMatch = document.getElementById('thirdMatch');
+
+        firstMatch.innerHTML = '';
+        thirdMatch.innerHTML = '';
+
+        if (teams.length >= 4) {
+            const first = teams[0];
+            const second = teams[1];
+            const third = teams[2];
+            const fourth = teams[3];
+
+            [first, second].forEach(t => firstMatch.appendChild(createFinalTeam(t)));
+            [third, fourth].forEach(t => thirdMatch.appendChild(createFinalTeam(t)));
+
+            attachSelection(firstMatch);
+            attachSelection(thirdMatch);
+        }
+    }
+
+    function createFinalTeam(team) {
+        const div = document.createElement('div');
+        div.classList.add('finalteam');
+
+        // Clone the flag image
+        const img = team.querySelector('img').cloneNode(true);
+
+        // Get the team name only (exclude numbers and arrow text)
+        const nameNode = team.cloneNode(true);
+        nameNode.querySelector('.btn-container').remove();
+        nameNode.querySelector('.position-number').remove();
+        const teamName = nameNode.textContent.trim();
+
+        // Append to card
+        div.appendChild(img);
+        div.appendChild(document.createTextNode(teamName));
+        return div;
+    }
+
+    function attachSelection(matchDiv) {
+        const teams = matchDiv.querySelectorAll('.finalteam');
+        teams.forEach(team => {
+            team.addEventListener('click', () => {
+                teams.forEach(t => t.classList.remove('selected'));
+                team.classList.add('selected');
+            });
+        });
+    }
+
+    function init() {
+        document.querySelectorAll('.up-btn').forEach(btn => {
+            btn.addEventListener('click', () => moveUp(btn));
+        });
+        document.querySelectorAll('.down-btn').forEach(btn => {
+            btn.addEventListener('click', () => moveDown(btn));
+        });
+        document.querySelectorAll('.team-list').forEach(updateTeams);
+        
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
